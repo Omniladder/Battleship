@@ -3,12 +3,12 @@ public class Controller {
     View gameView;
     Model gameState;
 
-    Controller(Model initialState, View userInterface) {
+    public Controller(Model initialState, View userInterface) {
         gameState = initialState;
         gameView = userInterface;
     }
 
     public void playGame() {
-
+        System.out.println("null");
     }
 }
