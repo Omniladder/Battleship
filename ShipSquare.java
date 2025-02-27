@@ -6,20 +6,21 @@ import java.awt.event.MouseMotionAdapter;
 
 import java.awt.*;
 
-class ShipSquare extends JPanel {
-    Point imageCoordinates, clickedLocation;
+class ShipSquare extends JComponent {
+    Point clickedLocation;
 
     int xPos, yPos;
     int imageSize;
     int offsetX, offsetY = 0;
     boolean isClicked = false;
+    GameGrid gameGrid;
 
-    public ShipSquare() {
+    public ShipSquare(GameGrid gameGrid) {
+        // Initial Starting Posisiton
         xPos = 100;
         yPos = 100;
-        imageSize = 80;
-
-        imageCoordinates = new Point(xPos, yPos);
+        this.gameGrid = gameGrid;
+        imageSize = gameGrid.cellHeight;
 
         ClickListener clickListener = new ClickListener();
         this.addMouseListener(clickListener);
@@ -51,6 +52,23 @@ class ShipSquare extends JPanel {
                 isClicked = false;
             }
         }
+
+        public void mouseReleased(MouseEvent event) {
+            // Add your release action here
+            isClicked = false;
+            clickedLocation = event.getPoint();
+
+            int[] cellIndex = gameGrid.getCellInside(clickedLocation);
+            if (cellIndex[0] == -1) {
+                return;
+            }
+
+            int[] cellLocation = gameGrid.getCellPosition(cellIndex);
+
+            xPos = cellLocation[0];
+            yPos = cellLocation[1];
+            repaint();
+        }
     }
 
     private class DragListener extends MouseMotionAdapter {
@@ -60,10 +78,9 @@ class ShipSquare extends JPanel {
                 Point currPoint = event.getPoint();
 
                 // imageCoordinates.translate(dx, dy);
-                imageCoordinates = currPoint;
-                imageCoordinates.translate(offsetX, offsetY);
-                xPos = imageCoordinates.x;
-                yPos = imageCoordinates.y;
+                currPoint.translate(offsetX, offsetY);
+                xPos = currPoint.x;
+                yPos = currPoint.y;
 
                 repaint();
             }

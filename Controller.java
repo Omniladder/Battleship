@@ -9,6 +9,6 @@ public class Controller {
     }
 
     public void playGame() {
-        System.out.println("null");
+
     }
 }
