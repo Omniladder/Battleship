@@ -51,7 +51,8 @@ class GameGrid extends JComponent {
         index[1] = (int) (mousePosition.y - top) / cellHeight;
 
         // Validates if inside a cell
-        if (index[0] > numOfCells || index[1] > numOfCells || index[0] < 0 || index[1] < 0) {
+        if (index[0] > numOfCells || index[1] > numOfCells || (mousePosition.x - left) < 0
+                || (mousePosition.y - top) < 0) {
             int[] dummyArr = new int[2];
             dummyArr[0] = -1;
             dummyArr[1] = -1;
