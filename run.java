@@ -23,6 +23,7 @@ public class run {
         ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
         View gameInterface = new View(gameState, imageIcon);
+        
 
         Controller gameController = new Controller(gameState, gameInterface);
         gameController.playGame();

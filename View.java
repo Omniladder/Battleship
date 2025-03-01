@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.ObjectOutputStream;
 
 /**
  * View object works as front end to the game takes User Inputs and runs
@@ -35,11 +36,12 @@ class SidePanel extends JComponent {
 public class View extends JFrame {
     Model gameState;
     ShipSquare testSquare;
+    ObjectOutputStream out; //this is passed in from client, and passed to shipsquare, to send coordinates
 
     SidePanel gameSide;
     GameGrid gameGrid;
 
-    View(Model gameState, ImageIcon backgroundImage) {
+    View(Model gameState, ImageIcon backgroundImage,ObjectOutputStream out) {
 
         int boardSize = 950;
 
@@ -53,7 +55,7 @@ public class View extends JFrame {
         setVisible(true);
 
         // Creates test Square to be used as ship
-        testSquare = new ShipSquare(gameGrid);
+        testSquare = new ShipSquare(gameGrid, out);
         add(testSquare);
 
         setVisible(true);
@@ -62,5 +64,13 @@ public class View extends JFrame {
         gameSide = new SidePanel(sidePanelSize, getHeight());
         add(gameSide);
 
+    }
+    // Method for client to get current position
+    public int[] getShipSquarePosition() {
+        return new int[]{testSquare.getXPosition(), testSquare.getYPosition()};
+    }
+    //Method for view to be updated by client
+    public void updateShipSquarePosition(int x, int y) {
+        testSquare.setPosition(x, y);
     }
 }

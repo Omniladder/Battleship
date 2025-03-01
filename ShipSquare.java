@@ -3,11 +3,14 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.ObjectOutputStream;
+
 
 import java.awt.*;
 
 class ShipSquare extends JComponent {
     Point clickedLocation;
+    ObjectOutputStream out; //this is passed in from view, and pipes output back to client->server connection. allows position sharing
 
     int xPos, yPos;
     int imageSize;
@@ -15,12 +18,13 @@ class ShipSquare extends JComponent {
     boolean isClicked = false;
     GameGrid gameGrid;
 
-    public ShipSquare(GameGrid gameGrid) {
+    public ShipSquare(GameGrid gameGrid, ObjectOutputStream out) {
         // Initial Starting Posisiton
         xPos = 100;
         yPos = 100;
         this.gameGrid = gameGrid;
         imageSize = gameGrid.cellHeight;
+        this.out = out; 
 
         ClickListener clickListener = new ClickListener();
         this.addMouseListener(clickListener);
@@ -68,6 +72,12 @@ class ShipSquare extends JComponent {
             xPos = cellLocation[0];
             yPos = cellLocation[1];
             repaint();
+            try {
+                out.writeObject(new int[]{xPos, yPos});
+                out.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -83,8 +93,24 @@ class ShipSquare extends JComponent {
                 yPos = currPoint.y;
 
                 repaint();
+
+                //After we repaint, drag and drop is finished, so we can send coordinates
+                
             }
         }
+    }
+    public void setPosition(int x, int y) {
+        xPos = x;
+        yPos = y;
+        repaint();
+    }
+
+    public int getXPosition() {
+        return xPos;
+    }
+
+    public int getYPosition() {
+        return yPos;
     }
 
 }
