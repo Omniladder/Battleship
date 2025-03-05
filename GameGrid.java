@@ -1,5 +1,9 @@
 import javax.swing.*;
+
 import java.awt.*;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 
 class GameGrid extends JComponent {
     int numOfCells;
@@ -7,8 +11,9 @@ class GameGrid extends JComponent {
     int top, left;
     int cellWidth, cellHeight;
     int strokeSize = 5;
+    Model gameState;
 
-    GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft) {
+    GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft, Model gameState) {
         this.numOfCells = numOfCells;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
@@ -16,6 +21,8 @@ class GameGrid extends JComponent {
         top = topLeft.y + strokeSize;
         this.cellHeight = boardHeight / numOfCells;
         this.cellWidth = boardWidth / numOfCells;
+        this.addMouseListener(new ClickListener());
+        this.gameState = gameState;
     }
 
     @Override
@@ -75,5 +82,25 @@ class GameGrid extends JComponent {
         index[0] = cellIndex[0] * cellWidth + left;
         index[1] = cellIndex[1] * cellHeight + top;
         return index;
+    }
+
+    private class ClickListener extends MouseAdapter {
+        public void mousePressed(MouseEvent event) {
+            int[] cellIndex = getCellInside(event.getPoint());
+
+            if (cellIndex[0] == -1) {
+                return;
+            }
+
+            gameState.fireShot(cellIndex[0], cellIndex[1]);
+
+            // int[] cellPos = getCellPosition(cellIndex);
+            Shot newShot = new Shot(gameState.getCellState(cellIndex[0], cellIndex[1]), cellIndex, GameGrid.this);
+            add(newShot);
+
+            // setOpaque(false);
+            setVisible(true);
+            repaint();
+        }
     }
 }

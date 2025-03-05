@@ -9,7 +9,7 @@ public class Controller {
     }
 
     public void playGame() {
-        gameState.setShipsRandom();
-        gameState.printBoard();
+
+        // gameState.printBoard();
     }
 }

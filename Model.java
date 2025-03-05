@@ -20,6 +20,7 @@ public class Model {
             }
         }
         this.boardSize = boardSize;
+        score = 0;
     }
 
     private void addShipSquare(int x, int y) {
@@ -54,16 +55,24 @@ public class Model {
     private void addShipRandom(int shipSize) {
         int shipTop, shipLeft;
         boolean direction; // 1 is left to right 0 is top down
+        Random rand = new Random();
 
-        shipTop = Math.abs((int) (Math.random() * (boardSize + 1) - shipSize));
-        shipLeft = Math.abs((int) (Math.random() * (boardSize + 1) - shipSize));
-        direction = Math.abs((Math.random() * 2)) == 1; // Has to be 0 or 1
+        do {
+            // Randomly choose direction
+            direction = rand.nextBoolean();
 
-        while (!isValidShipLocation(shipTop, shipLeft, shipSize, direction)) {
-            shipTop = Math.abs((int) (Math.random() * (boardSize) - shipSize));
-            shipLeft = Math.abs((int) (Math.random() * (boardSize) - shipSize));
-            direction = Math.abs((Math.random() * 2)) == 1; // Has to be 0 or 1
-        }
+            if (direction) {
+                // Horizontal placement
+                shipTop = rand.nextInt(boardSize + 1);
+                shipLeft = rand.nextInt(boardSize + 1 - shipSize);
+            } else {
+                // Vertical placement
+                shipTop = rand.nextInt(boardSize + 1);
+
+                shipLeft = rand.nextInt(boardSize + 1 - shipSize);
+            }
+
+        } while (!isValidShipLocation(shipTop, shipLeft, shipSize, direction));
 
         if (direction) {
             for (int i = 0; i < shipSize; i++) {
@@ -74,6 +83,23 @@ public class Model {
                 gameBoard[shipLeft][shipLeft + i] = 'S';
             }
         }
+    }
+
+    public char getCellState(int x, int y) {
+        return gameBoard[x][y];
+    }
+
+    public void fireShot(int x, int y) {
+        if (gameBoard[x][y] == 'S') {
+            gameBoard[x][y] = 'H'; // H is for Hit
+            score += 1;
+        } else {
+            gameBoard[x][y] = 'M'; // M is for Miss
+        }
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void setShipsRandom() {

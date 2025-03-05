@@ -22,11 +22,8 @@ class ShipSquare extends JComponent {
         this.gameGrid = gameGrid;
         imageSize = gameGrid.cellHeight;
 
-        ClickListener clickListener = new ClickListener();
-        this.addMouseListener(clickListener);
-
-        DragListener dragListener = new DragListener();
-        this.addMouseMotionListener(dragListener);
+        this.addMouseListener(new ClickListener());
+        this.addMouseMotionListener(new DragListener());
     }
 
     @Override
@@ -38,6 +35,18 @@ class ShipSquare extends JComponent {
 
         // Draw a square (x, y, width, height)
         g.fillRect(xPos, yPos, imageSize, imageSize); // x=100, y=100, size=100x100
+    }
+
+    public void setCellSquare(int x, int y) {
+        int[] cellIndex = { x, y };
+        if (cellIndex[0] == -1) {
+            return;
+        }
+
+        int[] cellLocation = gameGrid.getCellPosition(cellIndex);
+
+        xPos = cellLocation[0];
+        yPos = cellLocation[1];
     }
 
     private class ClickListener extends MouseAdapter {
@@ -54,20 +63,21 @@ class ShipSquare extends JComponent {
         }
 
         public void mouseReleased(MouseEvent event) {
-            // Add your release action here
-            isClicked = false;
-            clickedLocation = event.getPoint();
+            if (isClicked) {
+                isClicked = false;
+                clickedLocation = event.getPoint();
 
-            int[] cellIndex = gameGrid.getCellInside(clickedLocation);
-            if (cellIndex[0] == -1) {
-                return;
+                int[] cellIndex = gameGrid.getCellInside(clickedLocation);
+                if (cellIndex[0] == -1) {
+                    return;
+                }
+
+                int[] cellLocation = gameGrid.getCellPosition(cellIndex);
+
+                xPos = cellLocation[0];
+                yPos = cellLocation[1];
+                repaint();
             }
-
-            int[] cellLocation = gameGrid.getCellPosition(cellIndex);
-
-            xPos = cellLocation[0];
-            yPos = cellLocation[1];
-            repaint();
         }
     }
 

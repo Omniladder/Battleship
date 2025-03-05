@@ -10,7 +10,9 @@ import java.awt.image.BufferedImage;
  */
 public class run {
     public static void main(String[] args) {
-        Model gameState = new Model(8);
+        Model gameState = new Model(10);
+        // for (int i = 0; i < 50; i++)
+        gameState.setShipsRandom();
 
         File file = new File("./images/waterBackground.jpeg");
         BufferedImage bufferedImage = null;
