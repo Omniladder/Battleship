@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.*;
 
 /**
@@ -38,7 +41,7 @@ public class View extends JFrame {
 
     SidePanel gameSide;
     GameGrid gameGrid;
-    JPanel topBar;
+    JLabel scoreLabel;
 
     View(Model gameState, ImageIcon backgroundImage) {
 
@@ -49,17 +52,15 @@ public class View extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        topBar = new JPanel();
-        topBar.setBackground(new Color(50, 50, 50)); // Dark gray color
-        topBar.setBounds(0, 0, getWidth(), 50); // x, y, width, height
-        add(topBar);
-
         gameGrid = new GameGrid(10, getWidth() - sidePanelSize, getHeight(), new Point(sidePanelSize, 0), gameState);
         add(gameGrid);
         setVisible(true);
 
+        gameGrid.addMouseListener(new UpdateScoreBar(gameState));
+
         // Creates test Square to be used as ship
         testSquare = new ShipSquare(gameGrid);
+
         add(testSquare);
 
         for (int x = 0; x < 10; x++) {
@@ -73,10 +74,31 @@ public class View extends JFrame {
             }
         }
 
+        scoreLabel = new JLabel("Score: " + gameState.getScore());
+        scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        add(scoreLabel, BorderLayout.NORTH);
+
         // Creates Side Panel to Hold initial Ships
         gameSide = new SidePanel(sidePanelSize, getHeight());
         add(gameSide);
 
+    }
+
+    private class UpdateScoreBar extends MouseAdapter {
+        Model gameState;
+
+        UpdateScoreBar(Model gameState) {
+            this.gameState = gameState;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            // Remove existing top bar
+            scoreLabel.setText("Score: " + gameState.getScore());
+            System.out.println(gameState.getScore());
+            repaint(); // Redraw UI
+        }
     }
 
 }
