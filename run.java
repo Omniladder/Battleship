@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  */
 public class run {
     public static void main(String[] args) {
-        Model gameState = new Model();
+        Model gameState = new Model(8);
 
         File file = new File("./images/waterBackground.jpeg");
         BufferedImage bufferedImage = null;
