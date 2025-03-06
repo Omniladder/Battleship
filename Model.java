@@ -7,8 +7,6 @@ public class Model
 {
     public enum CellStatus //theirBoard
     {
-        EMPTY,
-        SHIP,
         HIT,
         MISS,
         DONTKNOW
