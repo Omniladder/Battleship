@@ -147,8 +147,8 @@ public class Model
         }
     }
 
-    public void receiveHitOrMiss(int row, int col, int hitData)
-    {
+    public void processScoreData(int row, int col, int hitData) //when you find out you got a hit, this is how you process that and change your board.
+    {                                                            //there should be a subsequent call in controller to send boardState to view
         if(hitData>0)
         {
             score++;
