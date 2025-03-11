@@ -92,10 +92,11 @@ class GameGrid extends JComponent {
                 return;
             }
 
-            gameState.fireShot(cellIndex[0], cellIndex[1]);
+            gameState.shoot(cellIndex[0], cellIndex[1]);
+            // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
 
             // int[] cellPos = getCellPosition(cellIndex);
-            Shot newShot = new Shot(gameState.getCellState(cellIndex[0], cellIndex[1]), cellIndex, GameGrid.this);
+            Shot newShot = new Shot(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]), cellIndex, GameGrid.this);
             add(newShot);
 
             // setOpaque(false);

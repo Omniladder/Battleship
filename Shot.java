@@ -3,12 +3,12 @@ import javax.swing.JComponent;
 import java.awt.*;
 
 class Shot extends JComponent {
-    char hitMiss;
+    Model.CellStatus hitMiss;
     int xCoord, yCoord;
     GameGrid gameGrid;
     int size;
 
-    Shot(char hitMiss, int[] coords, GameGrid gameGrid) {
+    Shot(Model.CellStatus hitMiss, int[] coords, GameGrid gameGrid) {
         this.hitMiss = hitMiss;
 
         this.xCoord = coords[0];
@@ -32,9 +32,10 @@ class Shot extends JComponent {
         int[] index = { this.xCoord, this.yCoord };
         index = gameGrid.getCellPosition(index);
 
-        if (hitMiss == 'H') {
+        if (hitMiss == Model.CellStatus.HIT) {
             g.setColor(Color.RED);
         } else {
+            // System.out.println("Display " + hitMiss);
             g.setColor(Color.LIGHT_GRAY);
         }
         // setComponentZOrder(this, 0);

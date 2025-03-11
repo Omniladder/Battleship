@@ -1,5 +1,7 @@
 import javax.swing.*;
 
+//import Model.ShipType;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.*;
@@ -66,7 +68,7 @@ public class View extends JFrame {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
-                if (gameState.getCellState(x, y) == 'S') {
+                if (gameState.getYourBoardIndex(x, y) != Model.ShipType.EMPTY) {
                     ShipSquare newSquare = new ShipSquare(gameGrid, out);
                     newSquare.setCellSquare(x, y);
                     add(newSquare);
@@ -97,7 +99,7 @@ public class View extends JFrame {
         public void mouseClicked(MouseEvent e) {
             // Remove existing top bar
             scoreLabel.setText("Score: " + gameState.getScore());
-            System.out.println(gameState.getScore());
+            System.out.println("Score: " + gameState.getScore());
             repaint(); // Redraw UI
         }
     }

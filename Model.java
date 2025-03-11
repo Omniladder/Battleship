@@ -31,124 +31,19 @@ public class Model {
     private int DestroyerLife = 2;
     int score = 0;
 
-    char[][] gameBoard;
     int boardSize;
     boolean playerMove = true;
 
     Model(int boardSize) {
-        gameBoard = new char[boardSize][boardSize];
-        for (int x = 0; x < boardSize; x++) {
-            for (int y = 0; y < boardSize; y++) {
-                gameBoard[x][y] = ' '; // ' ' Indicated No Ships
-            }
-        }
         this.boardSize = boardSize;
         score = 0;
-    }
-
-    private void addShipSquare(int x, int y) {
-        if (x > 0 && x < boardSize && y > 0 && y < boardSize) {
-            gameBoard[x][y] = 'S'; // 'S' Indicates Ship
-        }
-    }
-
-    private void removeShipSquare(int x, int y) {
-        if (x > 0 && x < boardSize && y > 0 && y < boardSize) {
-            gameBoard[x][y] = ' ';
-        }
-    }
-
-    private boolean isValidShipLocation(int shipTop, int shipLeft, int shipSize, boolean direction) {
-        if (direction) {
-            for (int i = 0; i < shipSize; i++) {
-                if (gameBoard[shipLeft + i][shipLeft] != ' ') {
-                    return false;
-                }
-            }
-        } else {
-            for (int i = 0; i < shipSize; i++) {
-                if (gameBoard[shipLeft][shipLeft + i] != ' ') {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private void addShipRandom(int shipSize) {
-        int shipTop, shipLeft;
-        boolean direction; // 1 is left to right 0 is top down
-        Random rand = new Random();
-
-        do {
-            // Randomly choose direction
-            direction = rand.nextBoolean();
-
-            if (direction) {
-                // Horizontal placement
-                shipTop = rand.nextInt(boardSize + 1);
-                shipLeft = rand.nextInt(boardSize + 1 - shipSize);
-            } else {
-                // Vertical placement
-                shipTop = rand.nextInt(boardSize + 1);
-
-                shipLeft = rand.nextInt(boardSize + 1 - shipSize);
-            }
-
-        } while (!isValidShipLocation(shipTop, shipLeft, shipSize, direction));
-
-        if (direction) {
-            for (int i = 0; i < shipSize; i++) {
-                gameBoard[shipLeft + i][shipLeft] = 'S';
-            }
-        } else {
-            for (int i = 0; i < shipSize; i++) {
-                gameBoard[shipLeft][shipLeft + i] = 'S';
-            }
-        }
-    }
-
-    public char getCellState(int x, int y) {
-        return gameBoard[x][y];
-    }
-
-    public void fireShot(int x, int y) {
-        if (gameBoard[x][y] == 'S') {
-            gameBoard[x][y] = 'H'; // H is for Hit
-            score += 1;
-        } else {
-            gameBoard[x][y] = 'M'; // M is for Miss
-        }
+        setTheirBoard();
+        emptyYourBoard();
+        setYourBoard();
     }
 
     public int getScore() {
         return score;
-    }
-
-    public void setShipsRandom() {
-        int[] shipsSize = { 2, 3, 3, 4, 5 };
-        for (int i = 0; i < shipsSize.length; i++) {
-            addShipRandom(shipsSize[i]);
-        }
-    }
-
-    public void printBoard() {
-        for (int x = 0; x < boardSize; x++) {
-            for (int y = 0; y < boardSize; y++) {
-                System.out.print("+-");
-            }
-            System.out.println("+");
-            System.out.print("|");
-            for (int y = 0; y < boardSize; y++) {
-
-                System.out.print(gameBoard[x][y] + "|");
-            }
-            System.out.println("");
-        }
-        for (int y = 0; y < boardSize; y++) {
-            System.out.print("+-");
-        }
-        System.out.println("+");
     }
 
     public void placeShip(int size, ShipType s, boolean isHorizontal) {
@@ -192,11 +87,18 @@ public class Model {
         }
     }
 
+    public void shoot(int row, int col) {
+        int result = checkForHit(row, col);
+        processScoreData(row, col, result);
+        printSinkMessage(result);
+    }
+
     // this is if they hit you
-    public int checkForHit(int row, int col) // returns -1 for miss, 0 for hit with no sink, and 1-5 for a hit+sink on a
-                                             // ship
+    private int checkForHit(int row, int col) // returns -1 for miss, 0 for hit with no sink, and 1-5 for a hit+sink on
+                                              // a ship
     {
-        int toReturn = -1;
+        // System.out.println("Check Hit:" + yourBoard[row][col]);
+        int toReturn = 0;
         switch (yourBoard[row][col]) {
             case CARRIER:
                 if (--CarrierLife == 0)
@@ -227,7 +129,8 @@ public class Model {
         return toReturn;
     }
 
-    public void printSinkMessage(int hitResult) { // pass in hit data from checkForHit to get correct message to display
+    private void printSinkMessage(int hitResult) { // pass in hit data from checkForHit to get correct message to
+                                                   // display
         switch (hitResult) {
             case -1:
                 System.out.println("Miss!");
@@ -259,14 +162,16 @@ public class Model {
     public void processScoreData(int row, int col, int hitData) // when you find out you got a hit, this is how you
                                                                 // process that and change your board.
     { // there should be a subsequent call in controller to send boardState to view
-        if (hitData > 0) {
+        // System.out.println(hitData);
+        if (hitData >= 0) {
             score++;
             theirBoard[row][col] = CellStatus.HIT;
         } else {
             theirBoard[row][col] = CellStatus.MISS;
         }
 
-        printSinkMessage(hitData); // doesnt necessarily require sink, but prints hit, miss, sink stuff
+        // printSinkMessage(hitData); // doesnt necessarily require sink, but prints
+        // hit, miss, sink stuff
     }
 
     public void setHit(int row, int col) {
@@ -306,51 +211,84 @@ public class Model {
         placeShip(DestroyerLife, ShipType.DESTROYER, getRandomOrientation());
     }
 
-    public void setYourBoardTest() {
-        DestroyerLife = 1;
-        emptyYourBoard();
-        yourBoard[0][0] = ShipType.DESTROYER;
+    /*
+     * Functions relating to getting the current state of the board relative to the
+     * player and the opponent
+     */
+    public ShipType getYourBoardIndex(int x, int y) {
+        return yourBoard[x][y];
     }
 
-    public void sinkOneShipTest() {
-        int hitIdentifier = checkForHit(0, 0);
-        printSinkMessage(hitIdentifier);
+    public ShipType[][] getYourBoardData() {
+        /*
+         * StringBuilder boardData = new StringBuilder();
+         * 
+         * // Loop through each row
+         * for (int i = 0; i < 10; i++) {
+         * // Loop through each column in the row
+         * for (int j = 0; j < 10; j++) {
+         * boardData.append(yourBoard[i][j].toString().charAt(0)); // Append the
+         * character (e.g., 'S' or '.')
+         * if (j < 10 - 1) {
+         * boardData.append(" "); // Add space between columns (optional)
+         * }
+         * }
+         * boardData.append("\n"); // Add a newline at the end of each row
+         * }
+         * 
+         * return boardData.toString(); // Return the board data as a string
+         */
+        return yourBoard;
     }
 
-    public String getYourBoardData() {
-        StringBuilder boardData = new StringBuilder();
+    public CellStatus getTheirBoardIndex(int x, int y) {
+        return theirBoard[x][y];
+    }
 
-        // Loop through each row
-        for (int i = 0; i < 10; i++) {
-            // Loop through each column in the row
-            for (int j = 0; j < 10; j++) {
-                boardData.append(yourBoard[i][j].toString().charAt(0)); // Append the character (e.g., 'S' or '.')
-                if (j < 10 - 1) {
-                    boardData.append(" "); // Add space between columns (optional)
+    public CellStatus[][] getTheirBoardData() {
+        /*
+         * StringBuilder boardData = new StringBuilder();
+         * 
+         * // Loop through each row
+         * for (int i = 0; i < 10; i++) {
+         * // Loop through each column in the row
+         * for (int j = 0; j < 10; j++) {
+         * boardData.append(theirBoard[i][j].toString().charAt(0)); // Append the
+         * character (e.g., 'S' or '.')
+         * if (j < 10 - 1) {
+         * boardData.append(" "); // Add space between columns (optional)
+         * }
+         * }
+         * boardData.append("\n"); // Add a newline at the end of each row
+         * }
+         * 
+         * return boardData.toString(); // Return the board data as a string
+         */
+        return theirBoard;
+    }
+
+    /*
+     * Debugging code used for outputting current state of the board to Console
+     */
+    public void printBoard() {
+        for (int x = 0; x < boardSize; x++) {
+            for (int y = 0; y < boardSize; y++) {
+                System.out.print("+-");
+            }
+            System.out.println("+");
+            System.out.print("|");
+            for (int y = 0; y < boardSize; y++) {
+                if (yourBoard[x][y] == ShipType.EMPTY) {
+                    System.out.print("X"); // Marks the location of a ship
+                } else {
+                    System.out.println(" "); // Marker for water
                 }
             }
-            boardData.append("\n"); // Add a newline at the end of each row
+            System.out.println("");
         }
-
-        return boardData.toString(); // Return the board data as a string
-    }
-
-    public String getTheirBoardData() {
-        StringBuilder boardData = new StringBuilder();
-
-        // Loop through each row
-        for (int i = 0; i < 10; i++) {
-            // Loop through each column in the row
-            for (int j = 0; j < 10; j++) {
-                boardData.append(theirBoard[i][j].toString().charAt(0)); // Append the character (e.g., 'S' or '.')
-                if (j < 10 - 1) {
-                    boardData.append(" "); // Add space between columns (optional)
-                }
-            }
-            boardData.append("\n"); // Add a newline at the end of each row
+        for (int y = 0; y < boardSize; y++) {
+            System.out.print("+-");
         }
-
-        return boardData.toString(); // Return the board data as a string
+        System.out.println("+");
     }
-
 }
