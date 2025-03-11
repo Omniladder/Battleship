@@ -1,4 +1,5 @@
 javac *.java
-java Server
-java Client
-java Client
+java Server &
+sleep 1
+java Client &
+java Client &
