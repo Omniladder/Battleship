@@ -1,2 +1,4 @@
 javac *.java
-java run
+java Server
+java Client
+java Client

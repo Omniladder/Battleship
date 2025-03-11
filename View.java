@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.io.ObjectOutputStream;
 
 /**
  * View object works as front end to the game takes User Inputs and runs
@@ -38,12 +39,13 @@ class SidePanel extends JComponent {
 public class View extends JFrame {
     Model gameState;
     ShipSquare testSquare;
+    ObjectOutputStream out; // this is passed in from client, and passed to shipsquare, to send coordinates
 
     SidePanel gameSide;
     GameGrid gameGrid;
     JLabel scoreLabel;
 
-    View(Model gameState, ImageIcon backgroundImage) {
+    View(Model gameState, ImageIcon backgroundImage, ObjectOutputStream out) {
 
         int boardSize = 950;
 
@@ -59,14 +61,13 @@ public class View extends JFrame {
         gameGrid.addMouseListener(new UpdateScoreBar(gameState));
 
         // Creates test Square to be used as ship
-        testSquare = new ShipSquare(gameGrid);
-
+        testSquare = new ShipSquare(gameGrid, out);
         add(testSquare);
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 if (gameState.getCellState(x, y) == 'S') {
-                    ShipSquare newSquare = new ShipSquare(gameGrid);
+                    ShipSquare newSquare = new ShipSquare(gameGrid, out);
                     newSquare.setCellSquare(x, y);
                     add(newSquare);
                     setVisible(true);
@@ -101,4 +102,13 @@ public class View extends JFrame {
         }
     }
 
+    // Method for client to get current position
+    public int[] getShipSquarePosition() {
+        return new int[] { testSquare.getXPosition(), testSquare.getYPosition() };
+    }
+
+    // Method for view to be updated by client
+    public void updateShipSquarePosition(int x, int y) {
+        testSquare.setPosition(x, y);
+    }
 }
