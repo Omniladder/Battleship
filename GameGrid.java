@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.MouseAdapter;
 
 class GameGrid extends JComponent {
@@ -12,6 +14,8 @@ class GameGrid extends JComponent {
     int cellWidth, cellHeight;
     int strokeSize = 5;
     Model gameState;
+
+    List<Shot> shots = new ArrayList<>();
 
     GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft, Model gameState) {
         this.numOfCells = numOfCells;
@@ -23,6 +27,24 @@ class GameGrid extends JComponent {
         this.cellWidth = boardWidth / numOfCells;
         this.addMouseListener(new ClickListener());
         this.gameState = gameState;
+        removeAll();
+        renderShots();
+    }
+
+    private void renderShots() {
+        removeAll();
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                int[] cellIndex = { x, y };
+                Model.CellStatus theirBIndex = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
+                if (theirBIndex != Model.CellStatus.DONTKNOW && gameState.isPlayersTurn()) {
+                    Shot newShot = new Shot(theirBIndex, cellIndex, GameGrid.this);
+                    add(newShot);
+                    newShot.setVisible(true);
+                }
+            }
+        }
+        repaint();
     }
 
     @Override
@@ -42,6 +64,12 @@ class GameGrid extends JComponent {
             g2d.drawLine(left, top + i * cellHeight, boardWidth + left, top + i * cellHeight);
         }
 
+        renderShots();
+        /*
+         * for (int i = 0; i < shots.size(); i++) {
+         * shots.get(i).paintComponent(g2d);
+         * }
+         */
     }
 
     public int getCellWidth() {
@@ -96,9 +124,6 @@ class GameGrid extends JComponent {
             // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
 
             // int[] cellPos = getCellPosition(cellIndex);
-            Shot newShot = new Shot(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]), cellIndex,
-                    GameGrid.this);
-            add(newShot);
 
             // setOpaque(false);
             setVisible(true);
