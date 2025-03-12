@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**

@@ -82,8 +82,8 @@ class ShipSquare extends JComponent {
                 yPos = cellLocation[1];
                 repaint();
                 try {
-                    out.writeObject(new int[] { xPos, yPos });
-                    out.flush();
+                    // out.writeObject(new int[] { xPos, yPos });
+                    // out.flush();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

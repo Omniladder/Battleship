@@ -86,9 +86,9 @@ class GameGrid extends JComponent {
 
     private class ClickListener extends MouseAdapter {
         public void mousePressed(MouseEvent event) {
-            int[] cellIndex = getCellInside(event.getPoint());
 
-            if (cellIndex[0] == -1) {
+            int[] cellIndex = getCellInside(event.getPoint());
+            if (cellIndex[0] == -1 || !gameState.isPlayersTurn()) {
                 return;
             }
 
@@ -96,12 +96,14 @@ class GameGrid extends JComponent {
             // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
 
             // int[] cellPos = getCellPosition(cellIndex);
-            Shot newShot = new Shot(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]), cellIndex, GameGrid.this);
+            Shot newShot = new Shot(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]), cellIndex,
+                    GameGrid.this);
             add(newShot);
 
             // setOpaque(false);
             setVisible(true);
             repaint();
+            gameState.waitForOpponent();
         }
     }
 }

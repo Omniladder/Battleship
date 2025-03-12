@@ -34,6 +34,9 @@ public class Server extends JFrame {
             outputs[i] = new ObjectOutputStream(clients[i].getOutputStream());
             outputs[i].flush();
             inputs[i] = new ObjectInputStream(clients[i].getInputStream());
+            int[] clientIndex = { i };
+            outputs[i].writeObject(clientIndex);
+            outputs[i].flush();
          }
 
          // Start threads to handle messages from both clients
@@ -45,14 +48,18 @@ public class Server extends JFrame {
                      // Read message from this client
                      Object message = inputs[clientIndex].readObject();
 
-                     // Send to both clients
-                     for (int j = 0; j < 2; j++) {
-                        outputs[j].writeObject(message);
-                        outputs[j].flush();
-                     }
+                     // Calculate opponent index (0->1, 1->0)
+                     int opponentIndex = (clientIndex + 1) % 2;
+
+                     // Send only to the opponent, not back to the sender
+                     displayMessage(
+                           "Player " + (clientIndex + 1) + " sent a message to Player " + (opponentIndex + 1) + "\n");
+                     outputs[opponentIndex].writeObject(message);
+                     outputs[opponentIndex].flush();
                   }
                } catch (IOException | ClassNotFoundException e) {
-                  displayMessage("Error handling client " + (clientIndex + 1) + ": " + e.getMessage() + "\n");
+                  displayMessage("Error handling client " + (clientIndex + 1) + ": Error Type :" + e
+                        + " Error Message: " + e.getMessage() + "\n");
                }
             }).start();
          }

@@ -3,6 +3,11 @@
  * Battleship model class holds all data relating to current state of the game
  * as well as manages aspects of functionality such as server validation etc.
  */
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.Random;
 
 public class Model {
@@ -31,12 +36,18 @@ public class Model {
     private int DestroyerLife = 2;
     int score = 0;
 
-    int boardSize;
-    boolean playerMove = true;
+    ObjectOutputStream out;
+    ObjectInputStream in;
 
-    Model(int boardSize) {
+    int boardSize;
+    boolean playerMove;
+
+    Model(int boardSize, int playerNumber, ObjectOutputStream out, ObjectInputStream in) {
         this.boardSize = boardSize;
+        playerMove = (playerNumber == 1);
         score = 0;
+        this.out = out;
+        this.in = in;
         setTheirBoard();
         emptyYourBoard();
         setYourBoard();
@@ -87,15 +98,55 @@ public class Model {
         }
     }
 
+    public boolean isPlayersTurn() {
+        return playerMove;
+    }
+
     public void shoot(int row, int col) {
-        int result = checkForHit(row, col);
-        processScoreData(row, col, result);
-        printSinkMessage(result);
+        int[] firePosition = { row, col };
+        try {
+            out.writeObject(firePosition);
+            out.flush();
+            System.out.println("Before Read IN");
+            int[] result = (int[]) in.readObject();
+            System.out.println("After Read IN");
+            printSinkMessage(result[0]);
+            if (result[0] >= 0) {
+                theirBoard[row][col] = Model.CellStatus.HIT;
+            } else {
+                theirBoard[row][col] = Model.CellStatus.MISS;
+            }
+            playerMove = !playerMove;
+            System.out.println("Player Move: " + playerMove);
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    public void waitForOpponent() {
+        new Thread(() -> {
+            System.out.println("Player Move: " + playerMove);
+            while (!playerMove) {
+                try {
+                    int[] firePosition = (int[]) in.readObject();
+                    for (int i = 0; i < firePosition.length; i++)
+                        System.out.println("Posistion " + i + " , " + firePosition[i]);
+                    System.out.println(firePosition[0] + " , " + firePosition[1]); // ::ERROR:: Reading in enum
+                    int[] result = { checkForHit(firePosition[0], firePosition[1]) };
+                    out.writeObject(result);
+                    out.flush();
+                    playerMove = !playerMove;
+                } catch (IOException | ClassNotFoundException e) {
+                    System.out.println("Error: " + e);
+                }
+            }
+        }).start();
     }
 
     // this is if they hit you
-    private int checkForHit(int row, int col) // returns -1 for miss, 0 for hit with no sink, and 1-5 for a hit+sink on
-                                              // a ship
+    public int checkForHit(int row, int col) // returns -1 for miss, 0 for hit with no sink, and 1-5 for a hit+sink on
+                                             // a ship
     {
         // System.out.println("Check Hit:" + yourBoard[row][col]);
         int toReturn = 0;
@@ -126,6 +177,7 @@ public class Model {
             default:
                 toReturn = 0;
         }
+        printSinkMessage(toReturn);
         return toReturn;
     }
 
@@ -162,7 +214,7 @@ public class Model {
     public void processScoreData(int row, int col, int hitData) // when you find out you got a hit, this is how you
                                                                 // process that and change your board.
     { // there should be a subsequent call in controller to send boardState to view
-        // System.out.println(hitData);
+        System.out.println(hitData);
         if (hitData >= 0) {
             score++;
             theirBoard[row][col] = CellStatus.HIT;
