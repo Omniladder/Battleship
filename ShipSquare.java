@@ -17,14 +17,16 @@ class ShipSquare extends JComponent {
     int offsetX, offsetY = 0;
     boolean isClicked = false;
     GameGrid gameGrid;
+    Model gameState;
 
-    public ShipSquare(GameGrid gameGrid, ObjectOutputStream out) {
+    public ShipSquare(GameGrid gameGrid, ObjectOutputStream out, Model gameState) {
         // Initial Starting Posisiton
         xPos = 100;
         yPos = 100;
         this.gameGrid = gameGrid;
         imageSize = gameGrid.cellHeight;
         this.out = out;
+        this.gameState = gameState;
 
         this.addMouseListener(new ClickListener());
         this.addMouseMotionListener(new DragListener());
@@ -34,11 +36,13 @@ class ShipSquare extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // Always call the super method first
 
-        // Set the color for the square
-        g.setColor(Color.GRAY);
+        if (!gameState.isPlayersTurn()) {
+            // Set the color for the square
+            g.setColor(Color.GRAY);
 
-        // Draw a square (x, y, width, height)
-        g.fillRect(xPos, yPos, imageSize, imageSize); // x=100, y=100, size=100x100
+            // Draw a square (x, y, width, height)
+            g.fillRect(xPos, yPos, imageSize, imageSize); // x=100, y=100, size=100x100
+        }
     }
 
     public void setCellSquare(int x, int y) {

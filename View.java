@@ -64,13 +64,13 @@ public class View extends JFrame {
         gameGrid.addMouseListener(new UpdateScoreBar(gameState));
 
         // Creates test Square to be used as ship
-        testSquare = new ShipSquare(gameGrid, out);
-        add(testSquare);
+        // testSquare = new ShipSquare(gameGrid, out,);
+        // add(testSquare);
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 if (gameState.getYourBoardIndex(x, y) != Model.ShipType.EMPTY) {
-                    ShipSquare newSquare = new ShipSquare(gameGrid, out);
+                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState);
                     newSquare.setCellSquare(x, y);
                     add(newSquare);
                     setVisible(true);
@@ -86,7 +86,6 @@ public class View extends JFrame {
         // Creates Side Panel to Hold initial Ships
         gameSide = new SidePanel(sidePanelSize, getHeight());
         add(gameSide);
-
     }
 
     private class UpdateScoreBar extends MouseAdapter {
