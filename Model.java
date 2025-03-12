@@ -3,8 +3,11 @@
  * Battleship model class holds all data relating to current state of the game
  * as well as manages aspects of functionality such as server validation etc.
  */
+import java.util.ArrayList;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -34,6 +37,9 @@ public class Model {
     private int CruiserLife = 3;
     private int SubmarineLife = 3;
     private int DestroyerLife = 2;
+    ArrayList<Ship> BattleShips = new ArrayList<>(); // this list of battleships contains ship classes
+                                                     // these contain x and y coords for translating ship stuff
+    
     int score = 0;
 
     ObjectOutputStream out;
@@ -57,7 +63,7 @@ public class Model {
         return score;
     }
 
-    public void placeShip(int size, ShipType s, boolean isHorizontal) {
+    public void placeShip(int size, ShipType s, boolean isHorizontal, int shipListIndex) {
         Random rand = new Random();
         boolean canPlace = false;
 
@@ -90,12 +96,76 @@ public class Model {
         if (canPlace) {
             for (int i = 0; i < size; i++) {
                 if (isHorizontal)
+                {
+                    BattleShips.get(shipListIndex).isHorizontal=true;
+                    //get correct ship --> access coords list --> get specific coord --> set it
+                    BattleShips.get(shipListIndex).xy_coords.get(i).setLocation(row,col+i);
                     yourBoard[row][col + i] = s;
+                }
                 else
+                {
+                    BattleShips.get(shipListIndex).isHorizontal=false;
+                    BattleShips.get(shipListIndex).xy_coords.get(i).setLocation(row+i,col);
+                    //BattleShips.get(shipListIndex).x_coords.set(i,row+i);
+                    //BattleShips.get(shipListIndex).y_coords.set(i,col);
                     yourBoard[row + i][col] = s;
+                }
             }
 
         }
+    }
+
+    // either return false, or <-1,-1> to show bad placement
+    // sectionClicked 
+    public boolean moveShipFromAtoB(int xa, int ya, int xb, int yb)
+    {
+        ShipType translatedShipType = yourBoard[xa][ya];
+        int BattleShipsIndex = -1;
+        //find the index in BattleShips (model arraylist) based on shipytype
+        switch(translatedShipType)
+        {
+            case CARRIER:
+                BattleShipsIndex = 0;
+                break;
+            case BATTLESHIP:
+                BattleShipsIndex = 1;
+                break;
+            case CRUISER:
+                BattleShipsIndex = 2;
+                break;
+            case SUBMARINE:
+                BattleShipsIndex = 3;
+                break;
+            case DESTROYER:
+                BattleShipsIndex = 4;
+                break;
+            default:
+                System.out.println("Something aint right");
+                break;
+        }
+
+
+        //take initially clicked point and figure out where in the ship it is
+        Point initiallyClickedPoint = new Point(xa,ya);
+        int sectionClicked = BattleShips.get(BattleShipsIndex).xy_coords.indexOf(initiallyClickedPoint);
+        
+        //iterate before, at, and after the clicked point and transfer data to new arraylist
+        //to translate point:
+        // Xn_New = ReleaseX + (Xn_Old - X_initial)
+        //new x is relseased x + diff between oldx and clicked x
+
+        //same logic for y
+
+        //ships down randomly --> click on shipsquare --> records position --> when released, check if valid
+        //if valid, iterate through points list and translate coordinates, if not return to square
+        //maybe make image (square,arrow,etc...) follow cursor to show user is doing something
+        int tIndex = 0;
+
+        
+
+
+        
+        return false;
     }
 
     public boolean isPlayersTurn() {
@@ -256,11 +326,12 @@ public class Model {
     }
 
     public void setYourBoard() {
-        placeShip(CarrierLife, ShipType.CARRIER, getRandomOrientation());
-        placeShip(BattleshipLife, ShipType.BATTLESHIP, getRandomOrientation());
-        placeShip(CruiserLife, ShipType.CRUISER, getRandomOrientation());
-        placeShip(SubmarineLife, ShipType.SUBMARINE, getRandomOrientation());
-        placeShip(DestroyerLife, ShipType.DESTROYER, getRandomOrientation());
+
+        placeShip(CarrierLife, ShipType.CARRIER, getRandomOrientation(),0);
+        placeShip(BattleshipLife, ShipType.BATTLESHIP, getRandomOrientation(),1);
+        placeShip(CruiserLife, ShipType.CRUISER, getRandomOrientation(),2);
+        placeShip(SubmarineLife, ShipType.SUBMARINE, getRandomOrientation(),3);
+        placeShip(DestroyerLife, ShipType.DESTROYER, getRandomOrientation(),4);
     }
 
     /*
@@ -343,4 +414,12 @@ public class Model {
         }
         System.out.println("+");
     }
+}
+
+class Ship
+{
+    ArrayList<Point> xy_coords = new ArrayList<>();
+    ArrayList<Point> new_xy_coords = new ArrayList<>();
+    Boolean isHorizontal;
+    Model.ShipType type;
 }
