@@ -80,6 +80,11 @@ class ShipSquare extends JComponent {
                     return;
                 }
 
+                //ships are not placed. we can do stuff
+                if(!gameState.getCanMoveShips())
+                {
+                    
+                }
                 int[] cellLocation = gameGrid.getCellPosition(cellIndex);
 
                 xPos = cellLocation[0];

@@ -41,12 +41,17 @@ class SidePanel extends JComponent {
 
 public class View extends JFrame {
     Model gameState;
+    boolean isClicked = false;
     ShipSquare testSquare;
     ObjectOutputStream out; // this is passed in from client, and passed to shipsquare, to send coordinates
 
+    int xa, ya;
+    int xb, yb;
     SidePanel gameSide;
     GameGrid gameGrid;
     JLabel scoreLabel;
+    int[] cellIndexStarting;
+
 
     View(Model gameState, ImageIcon backgroundImage, ObjectOutputStream out) {
 
@@ -60,13 +65,14 @@ public class View extends JFrame {
         gameGrid = new GameGrid(10, getWidth() - sidePanelSize, getHeight(), new Point(sidePanelSize, 0), gameState);
         add(gameGrid);
         setVisible(true);
-
+        this.gameState = gameState;
         gameGrid.addMouseListener(new UpdateScoreBar(gameState));
-
+        
         // Creates test Square to be used as ship
         // testSquare = new ShipSquare(gameGrid, out,);
         // add(testSquare);
-
+        
+        //updateView();
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 if (gameState.getYourBoardIndex(x, y) != Model.ShipType.EMPTY) {
@@ -96,13 +102,52 @@ public class View extends JFrame {
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mousePressed(MouseEvent e) {
             // Remove existing top bar
+            //get mouse x and y
+            Point p = e.getPoint();
+            int[] pcoords = gameGrid.getCellInside(p);
+            xa = pcoords[0];
+            ya = pcoords[1];
+            //get cell index
+            cellIndexStarting = gameGrid.getCellInside(new Point(xa, ya));
+            System.out.println("Mouse Pressed at: " + xa + ", " + ya);
             scoreLabel.setText("Score: " + gameState.getScore());
             System.out.println("Score: " + gameState.getScore());
             repaint(); // Redraw UI
         }
-    }
+
+        @Override
+        public void mouseReleased(MouseEvent event) {
+                Point clickedLocation = event.getPoint();
+                System.out.println("Mouse Released at: " + clickedLocation.getX() + ", " + clickedLocation.getY());
+                int[] cellIndex = gameGrid.getCellInside(clickedLocation);
+                System.out.println("Cell Index: " + cellIndex[0] + ", " + cellIndex[1]);
+                if (cellIndex[0] == -1) {
+                    return;
+                }
+
+
+                //int[] cellLocation = gameGrid.getCellPosition(cellIndex);
+                //ships are not placed. we can do stuff
+                if(gameState.getCanMoveShips())
+                {
+                    gameState.moveShipFromAtoB(xa, ya, cellIndex[0], cellIndex[1]);
+                    gameState.printBoard();
+                    renderView();
+                    repaint();
+                }
+                
+                try {
+                    // out.writeObject(new int[] { xPos, yPos });
+                    // out.flush();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    
 
     // Method for client to get current position
     public int[] getShipSquarePosition() {
@@ -113,4 +158,34 @@ public class View extends JFrame {
     public void updateShipSquarePosition(int x, int y) {
         testSquare.setPosition(x, y);
     }
+
+    public void renderView()
+    {
+        //removeAll();        
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                int[] cellIndex = { x, y };
+                Model.ShipType yourBoard = gameState.getYourBoardIndex(cellIndex[0], cellIndex[1]);
+                if (yourBoard != Model.ShipType.EMPTY) 
+                {
+                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState);
+                    newSquare.setCellSquare(x, y);
+                    add(newSquare);
+                    setVisible(true);
+                }
+            }
+        }
+        scoreLabel = new JLabel("Score: " + gameState.getScore());
+        scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        add(scoreLabel, BorderLayout.NORTH);
+
+        // Creates Side Panel to Hold initial Ships
+        gameSide = new SidePanel(300, getHeight());
+        add(gameSide);
+        repaint();
+
+    }
+
+   
 }
