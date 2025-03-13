@@ -49,6 +49,7 @@ public class Model {
     int boardSize;
     boolean playerMove;
 
+    
     Model(int boardSize, int playerNumber, ObjectOutputStream out, ObjectInputStream in) {
         this.boardSize = boardSize;
         playerMove = (playerNumber == 1);
@@ -62,6 +63,10 @@ public class Model {
 
     public boolean getCanMoveShips() {
         return canMoveShips;
+    }
+    public void setCanMoveShips(boolean canMoveShips)
+    {
+        this.canMoveShips = canMoveShips;
     }
 
     public int getScore() {

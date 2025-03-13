@@ -1,5 +1,7 @@
 import javax.swing.*;
 
+import java.awt.event.ActionListener;
+
 //import Model.ShipType;
 
 import java.awt.event.MouseAdapter;
@@ -51,6 +53,7 @@ public class View extends JFrame {
     GameGrid gameGrid;
     JLabel scoreLabel;
     int[] cellIndexStarting;
+    JButton startButton;
 
     View(Model gameState, ImageIcon backgroundImage, ObjectOutputStream out) {
 
@@ -60,6 +63,17 @@ public class View extends JFrame {
         setSize(boardSize + sidePanelSize, boardSize);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        startButton = new JButton("Click Me");
+        startButton.setPreferredSize(new Dimension(100,50));
+        startButton.setBounds(100,450,100,50);
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                System.out.println("SHIPS SET IN PLACE");
+                gameState.setCanMoveShips(true);
+            }
+        });
+        add(startButton);
 
         gameGrid = new GameGrid(10, getWidth() - sidePanelSize, getHeight(), new Point(sidePanelSize, 0), gameState);
         add(gameGrid);
