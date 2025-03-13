@@ -36,7 +36,8 @@ class ShipSquare extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // Always call the super method first
 
-        if (!gameState.isPlayersTurn()) {
+        // if (!gameState.isPlayersTurn())
+        {
             // Set the color for the square
             g.setColor(Color.GRAY);
 
@@ -80,10 +81,9 @@ class ShipSquare extends JComponent {
                     return;
                 }
 
-                //ships are not placed. we can do stuff
-                if(!gameState.getCanMoveShips())
-                {
-                    
+                // ships are not placed. we can do stuff
+                if (!gameState.getCanMoveShips()) {
+
                 }
                 int[] cellLocation = gameGrid.getCellPosition(cellIndex);
 

@@ -177,7 +177,12 @@ public class Model {
             // check if new points are valid. no index out of bounds, and no ship already
             // there
             if (new_x > yourBoard.length || new_y > yourBoard.length || new_x < 0 || new_y < 0
-                    || yourBoard[new_x][new_y] != ShipType.EMPTY) // cannot translate point. space already occupied
+                    || (yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType)) // cannot
+                                                                                                                     // translate
+                                                                                                                     // point.
+                                                                                                                     // space
+                                                                                                                     // already
+                                                                                                                     // occupied
             {
                 // clear transferred points
                 BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
