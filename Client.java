@@ -25,7 +25,7 @@ class Client {
          BufferedImage bufferedImage = ImageIO.read(new File("./images/waterBackground.jpeg"));
          ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
-         // Create View and pass network streams
+         // Create Vie  w and pass network streams
          gameView = new View(gameState, imageIcon, out);
          // Start listener thread to update the view
          // startListeningForUpdates();

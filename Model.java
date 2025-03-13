@@ -1,4 +1,3 @@
-
 /**
  * Battleship model class holds all data relating to current state of the game
  * as well as manages aspects of functionality such as server validation etc.
@@ -7,7 +6,7 @@ import java.util.ArrayList;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.awt.Point;
-import java.awt.geom.Point2D;
+//import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -37,6 +36,7 @@ public class Model {
     private int CruiserLife = 3;
     private int SubmarineLife = 3;
     private int DestroyerLife = 2;
+    private boolean canMoveShips = true;
     ArrayList<Ship> BattleShips = new ArrayList<>(); // this list of battleships contains ship classes
                                                      // these contain x and y coords for translating ship stuff
     
@@ -59,6 +59,10 @@ public class Model {
         setYourBoard();
     }
 
+    public boolean getCanMoveShips()
+    {
+        return canMoveShips;
+    }
     public int getScore() {
         return score;
     }
@@ -116,9 +120,16 @@ public class Model {
     }
 
     // either return false, or <-1,-1> to show bad placement
-    // sectionClicked 
+    //clicked section doesnt matter. all points translated the same
+    //points might be doubles, not ints. if thats the case:
+    // cast double --> int --> string
     public boolean moveShipFromAtoB(int xa, int ya, int xb, int yb)
     {
+        //if game has started, dont allow ships to move
+        if(!canMoveShips)
+        {
+            return false;
+        }
         ShipType translatedShipType = yourBoard[xa][ya];
         int BattleShipsIndex = -1;
         //find the index in BattleShips (model arraylist) based on shipytype
@@ -144,28 +155,41 @@ public class Model {
                 break;
         }
 
+        //difference in points. where you dragged from doesnt matter
+        int dx = xb-xa;
+        int dy = yb-ya;
 
-        //take initially clicked point and figure out where in the ship it is
-        Point initiallyClickedPoint = new Point(xa,ya);
-        int sectionClicked = BattleShips.get(BattleShipsIndex).xy_coords.indexOf(initiallyClickedPoint);
+        //check to see if points are valid
+
+        for(Point p: BattleShips.get(BattleShipsIndex).xy_coords)
+        {
+            
+            int new_x = (int) p.getX() + dx;
+            int new_y = (int) p.getY() + dy;
+            BattleShips.get(BattleShipsIndex).new_xy_coords.add(p);
+            //check if new points are valid. no index out of bounds, and no ship already there
+            if(new_x < yourBoard.length || new_y < yourBoard.length || yourBoard[new_x][new_y] != ShipType.EMPTY) //cannot translate point. space already occupied
+            {
+                //clear transferred points
+                BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
+                System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or make it go somewhere else");
+                return false;
+            }
+        }
+
+        //if we're all good with the new points, then we can swap
+        for(int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size();i++)
+        {
+            //set the old point with the new point
+            BattleShips.get(BattleShipsIndex).xy_coords.set(i, BattleShips.get(BattleShipsIndex).new_xy_coords.get(i));
+        }
+        BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
+        return true;
         
-        //iterate before, at, and after the clicked point and transfer data to new arraylist
-        //to translate point:
-        // Xn_New = ReleaseX + (Xn_Old - X_initial)
-        //new x is relseased x + diff between oldx and clicked x
-
-        //same logic for y
-
+        //how should we move ships?
         //ships down randomly --> click on shipsquare --> records position --> when released, check if valid
         //if valid, iterate through points list and translate coordinates, if not return to square
-        //maybe make image (square,arrow,etc...) follow cursor to show user is doing something
-        int tIndex = 0;
-
-        
-
-
-        
-        return false;
+        //maybe make image (square,arrow,etc...) follow cursor to show user is doing something   
     }
 
     public boolean isPlayersTurn() {
@@ -327,6 +351,44 @@ public class Model {
 
     public void setYourBoard() {
 
+        // Create ships to avoid IOB exception
+        Ship Carrier = new Ship();
+        for (int i = 0; i < 5; i++) {
+            Carrier.xy_coords.add(new Point(-1, -1));
+            Carrier.new_xy_coords.add(new Point(-1, -1));
+        }
+        BattleShips.add(Carrier);
+
+        Ship Battleship = new Ship();
+        for (int i = 0; i < 4; i++) {
+            Battleship.xy_coords.add(new Point(-1, -1));
+            Battleship.new_xy_coords.add(new Point(-1, -1));
+        }
+        BattleShips.add(Battleship);
+
+        Ship Cruiser = new Ship();
+        for (int i = 0; i < 3; i++) {
+            Cruiser.xy_coords.add(new Point(-1, -1));
+            Cruiser.new_xy_coords.add(new Point(-1, -1));
+        }
+        BattleShips.add(Cruiser);
+
+        Ship Submarine = new Ship();
+        for (int i = 0; i < 3; i++) {
+            Submarine.xy_coords.add(new Point(-1, -1));
+            Submarine.new_xy_coords.add(new Point(-1, -1));
+        }
+        BattleShips.add(Submarine);
+
+        Ship Destroyer = new Ship();
+        for (int i = 0; i < 2; i++) {
+            Destroyer.xy_coords.add(new Point(-1, -1));
+            Destroyer.new_xy_coords.add(new Point(-1, -1));
+        }
+        BattleShips.add(Destroyer);
+
+        
+        BattleShips.add(new Ship());
         placeShip(CarrierLife, ShipType.CARRIER, getRandomOrientation(),0);
         placeShip(BattleshipLife, ShipType.BATTLESHIP, getRandomOrientation(),1);
         placeShip(CruiserLife, ShipType.CRUISER, getRandomOrientation(),2);
@@ -414,12 +476,22 @@ public class Model {
         }
         System.out.println("+");
     }
+
+    public void printTestMessage() {
+        System.out.println("Test button clicked!");
+    }
+
+    public void handleTestButtonClick() {
+        System.out.println("Test button clicked in Model!");
+        // Add any additional logic you want to execute when the button is clicked
+    }
 }
 
 class Ship
 {
-    ArrayList<Point> xy_coords = new ArrayList<>();
-    ArrayList<Point> new_xy_coords = new ArrayList<>();
+    ArrayList<java.awt.Point> xy_coords = new ArrayList<>();
+
+    ArrayList<java.awt.Point> new_xy_coords = new ArrayList<>();
     Boolean isHorizontal;
     Model.ShipType type;
 }
