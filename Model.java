@@ -166,7 +166,12 @@ public class Model {
             Point p = BattleShips.get(BattleShipsIndex).xy_coords.get(j);
             int new_x = (int) p.getX() + dx;
             int new_y = (int) p.getY() + dy;
-            if (yourBoard[new_x][new_y] != ShipType.EMPTY) // cannot translate point. space already occupied
+            if ((yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType)) // cannot
+                                                                                                              // translate
+                                                                                                              // point.
+                                                                                                              // space
+                                                                                                              // already
+                                                                                                              // occupied
             {
                 // System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or
                 // make it go somewhere else");
@@ -191,18 +196,15 @@ public class Model {
             }
         }
 
-        // if we're all good with the new points, then we can swap
         for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
             // set old points to empty
-            System.out.println("Old X: " + BattleShips.get(BattleShipsIndex).xy_coords.get(i).getX() + " Old Y: "
-                    + BattleShips.get(BattleShipsIndex).xy_coords.get(i).getY());
-            System.out.println("New X: " + BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getX() + " New Y: "
-                    + BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY());
             yourBoard[(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i)
                     .getX()][(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i).getY()] = ShipType.EMPTY;
             // SET THE MODEL TO NEW POINT
-            System.out.println((int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getX());
-            System.out.println((int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY());
+        }
+        // if we're all good with the new points, then we can swap
+        for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
+            // SET THE MODEL TO NEW POINT
             yourBoard[(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i)
                     .getX()][(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY()] = translatedShipType;
             // set the old point with the new point
