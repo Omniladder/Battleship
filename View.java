@@ -158,6 +158,12 @@ public class View extends JFrame {
     public void renderView() {
         // removeAll();
         getContentPane().removeAll();
+
+        gameGrid = new GameGrid(10, getWidth() - 300, getHeight(), new Point(300, 0), gameState);
+        add(gameGrid);
+        setVisible(true);
+        gameGrid.addMouseListener(new UpdateScoreBar(gameState));
+
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 int[] cellIndex = { x, y };
@@ -170,6 +176,7 @@ public class View extends JFrame {
                 }
             }
         }
+
         scoreLabel = new JLabel("Score: " + gameState.getScore());
         scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
         scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));

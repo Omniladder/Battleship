@@ -520,7 +520,11 @@ class Ship {
     Model.ShipType type;
 
     void setNewCoords(int index, Point p) {
-        new_xy_coords.set(index, p);
+        if (index >= new_xy_coords.size()) {
+            new_xy_coords.add(p);
+        } else {
+            new_xy_coords.set(index, p);
+        }
     }
 
     void setShipPoint(int x, int y, int index) {
