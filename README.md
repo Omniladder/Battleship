@@ -35,3 +35,7 @@ java run
 - If your program requires additional libraries, include them using the `-classpath` (`-cp`) option.
 
 For further troubleshooting, refer to the official [Java Documentation](https://docs.oracle.com/en/java/).
+
+
+Battleship designs:
+https://www.reddit.com/r/WarshipPorn/comments/lves6j/aerial_view_of_some_treaty_battleships_from_the/
