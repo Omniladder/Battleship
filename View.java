@@ -70,7 +70,7 @@ public class View extends JFrame {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 System.out.println("SHIPS SET IN PLACE");
-                gameState.setCanMoveShips(true);
+                gameState.setCanMoveShips(false);
             }
         });
         add(startButton);
@@ -173,6 +173,18 @@ public class View extends JFrame {
         // removeAll();
         getContentPane().removeAll();
 
+        startButton = new JButton("Click Me");
+        startButton.setPreferredSize(new Dimension(100,50));
+        startButton.setBounds(100,450,100,50);
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                System.out.println("SHIPS SET IN PLACE");
+                gameState.setCanMoveShips(false);
+            }
+        });
+        add(startButton);
+
         gameGrid = new GameGrid(10, getWidth() - 300, getHeight(), new Point(300, 0), gameState);
         add(gameGrid);
         setVisible(true);
@@ -195,6 +207,7 @@ public class View extends JFrame {
         scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
         scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(scoreLabel, BorderLayout.NORTH);
+
 
         // Creates Side Panel to Hold initial Ships
         gameSide = new SidePanel(300, getHeight());
