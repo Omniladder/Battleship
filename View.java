@@ -58,10 +58,10 @@ public class View extends JFrame {
 
     View(Model gameState, ObjectOutputStream out) {
 
-        int boardSize = 950;
+        int boardSize = 1000;
 
         int sidePanelSize = 300;
-        setSize(boardSize + sidePanelSize, boardSize);
+        setSize(boardSize + sidePanelSize + 12, boardSize + sidePanelSize);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         startButton = new JButton("Play Game");
@@ -86,7 +86,7 @@ public class View extends JFrame {
         // Creates test Square to be used as ship
         // testSquare = new ShipSquare(gameGrid, out,);
         // add(testSquare);
-        gameGrid = new GameGrid(10, getWidth() - sidePanelSize, getHeight(), new Point(sidePanelSize, 0), gameState);
+        gameGrid = new GameGrid(10, boardSize, boardSize, new Point(sidePanelSize, 0), gameState);
         // updateView();
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
