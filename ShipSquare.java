@@ -27,9 +27,6 @@ class ShipSquare extends JComponent {
         imageSize = gameGrid.cellHeight;
         this.out = out;
         this.gameState = gameState;
-
-        this.addMouseListener(new ClickListener());
-        this.addMouseMotionListener(new DragListener());
     }
 
     @Override
@@ -41,7 +38,7 @@ class ShipSquare extends JComponent {
             g.setColor(Color.GRAY);
 
             // Draw a square (x, y, width, height)
-            g.fillRect(xPos, yPos, imageSize, imageSize); // x=100, y=100, size=100x100
+            g.fillRect(xPos + 3, yPos + 3, imageSize - 5, imageSize - 5); // x=100, y=100, size=100x100
         }
     }
 
@@ -57,67 +54,72 @@ class ShipSquare extends JComponent {
         yPos = cellLocation[1];
     }
 
-    private class ClickListener extends MouseAdapter {
-        public void mousePressed(MouseEvent event) {
-            clickedLocation = event.getPoint();
-            if (clickedLocation.getX() > xPos && clickedLocation.getX() < xPos + imageSize
-                    && clickedLocation.getY() < yPos + imageSize && clickedLocation.getY() > yPos) {
-                offsetX = xPos - clickedLocation.x;
-                offsetY = yPos - clickedLocation.y;
-                isClicked = true;
-            } else {
-                isClicked = false;
-            }
-        }
+    /*
+     * private class ClickListener extends MouseAdapter {
+     * public void mousePressed(MouseEvent event) {
+     * clickedLocation = event.getPoint();
+     * if (clickedLocation.getX() > xPos && clickedLocation.getX() < xPos +
+     * imageSize
+     * && clickedLocation.getY() < yPos + imageSize && clickedLocation.getY() >
+     * yPos) {
+     * offsetX = xPos - clickedLocation.x;
+     * offsetY = yPos - clickedLocation.y;
+     * isClicked = true;
+     * } else {
+     * isClicked = false;
+     * }
+     * }
+     * 
+     * public void mouseReleased(MouseEvent event) {
+     * if (isClicked) {
+     * isClicked = false;
+     * clickedLocation = event.getPoint();
+     * 
+     * int[] cellIndex = gameGrid.getCellInside(clickedLocation);
+     * if (cellIndex[0] == -1) {
+     * return;
+     * }
+     * 
+     * // ships are not placed. we can do stuff
+     * if (!gameState.getCanMoveShips()) {
+     * 
+     * }
+     * int[] cellLocation = gameGrid.getCellPosition(cellIndex);
+     * 
+     * xPos = cellLocation[0];
+     * yPos = cellLocation[1];
+     * repaint();
+     * try {
+     * // out.writeObject(new int[] { xPos, yPos });
+     * // out.flush();
+     * } catch (Exception e) {
+     * e.printStackTrace();
+     * }
+     * }
+     * 
+     * }
+     */
 
-        public void mouseReleased(MouseEvent event) {
-            if (isClicked) {
-                isClicked = false;
-                clickedLocation = event.getPoint();
-
-                int[] cellIndex = gameGrid.getCellInside(clickedLocation);
-                if (cellIndex[0] == -1) {
-                    return;
-                }
-
-                // ships are not placed. we can do stuff
-                if (!gameState.getCanMoveShips()) {
-
-                }
-                int[] cellLocation = gameGrid.getCellPosition(cellIndex);
-
-                xPos = cellLocation[0];
-                yPos = cellLocation[1];
-                repaint();
-                try {
-                    // out.writeObject(new int[] { xPos, yPos });
-                    // out.flush();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-    }
-
-    private class DragListener extends MouseMotionAdapter {
-        public void mouseDragged(MouseEvent event) {
-
-            if (isClicked) {
-                Point currPoint = event.getPoint();
-
-                // imageCoordinates.translate(dx, dy);
-                currPoint.translate(offsetX, offsetY);
-                xPos = currPoint.x;
-                yPos = currPoint.y;
-
-                repaint();
-
-                // After we repaint, drag and drop is finished, so we can send coordinates
-
-            }
-        }
-    }
+    /*
+     * private class DragListener extends MouseMotionAdapter {
+     * public void mouseDragged(MouseEvent event) {
+     * 
+     * if (isClicked) {
+     * Point currPoint = event.getPoint();
+     * 
+     * // imageCoordinates.translate(dx, dy);
+     * currPoint.translate(offsetX, offsetY);
+     * xPos = currPoint.x;
+     * yPos = currPoint.y;
+     * 
+     * repaint();
+     * 
+     * // After we repaint, drag and drop is finished, so we can send coordinates
+     * 
+     * }
+     * }
+     * }
+     */
 
     public void setPosition(int x, int y) {
         xPos = x;

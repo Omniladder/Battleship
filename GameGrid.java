@@ -1,8 +1,14 @@
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 
 import java.awt.*;
 
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.MouseAdapter;
@@ -54,6 +60,26 @@ class GameGrid extends JComponent {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(strokeSize));
+
+        try {
+            // Load the image
+            File waterFile = new File("images/water.jpg");
+            BufferedImage waterBackground = ImageIO.read(waterFile);
+            // Set position and size
+
+            for (int x = 0; x < numOfCells; x++) {
+                for (int y = 0; y < numOfCells; y++) {
+                    g2d.drawImage(waterBackground, left + x * cellWidth, top + y * cellHeight, cellWidth, cellHeight,
+                            this);
+                }
+            }
+
+        } catch (Exception e) {
+            // System.err.println("Attempted to load from: " + new
+            // File("./images/water.jpg").getAbsolutePath());
+            e.printStackTrace();
+        }
+
         // Draws Grid rows
         for (int i = 0; i <= numOfCells; i++) {
             g2d.drawLine(left + i * cellWidth, top, left + i * cellWidth, boardHeight + top);
@@ -65,6 +91,7 @@ class GameGrid extends JComponent {
         }
 
         renderShots();
+
         /*
          * for (int i = 0; i < shots.size(); i++) {
          * shots.get(i).paintComponent(g2d);
@@ -114,14 +141,12 @@ class GameGrid extends JComponent {
 
     private class ClickListener extends MouseAdapter {
         public void mousePressed(MouseEvent event) {
-            //ships are set in place. now we can play
-            if(!gameState.getCanMoveShips()) 
-            {
+            // ships are set in place. now we can play
+            if (!gameState.getCanMoveShips()) {
                 int[] cellIndex = getCellInside(event.getPoint());
                 if (cellIndex[0] == -1 || !gameState.isPlayersTurn()) {
                     return;
                 }
-
 
                 gameState.shoot(cellIndex[0], cellIndex[1]);
                 // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));

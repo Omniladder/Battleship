@@ -22,11 +22,9 @@ class Client {
 
          // Initialize Game
          gameState = new Model(10, playerNumberContainer[0], out, in);
-         BufferedImage bufferedImage = ImageIO.read(new File("./images/waterBackground.jpeg"));
-         ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
          // Create Vie w and pass network streams
-         gameView = new View(gameState, imageIcon, out);
+         gameView = new View(gameState, out);
          // Start listener thread to update the view
          // startListeningForUpdates();
          gameState.waitForOpponent();
