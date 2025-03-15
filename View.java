@@ -56,12 +56,19 @@ public class View extends JFrame {
     int[] cellIndexStarting;
     JButton startButton;
 
+    int boardSize;
+    int sidePanelSize;
+
     View(Model gameState, ObjectOutputStream out) {
 
-        int boardSize = 1000;
+        boardSize = 1000;
 
-        int sidePanelSize = 300;
+        sidePanelSize = 300;
         setSize(boardSize + sidePanelSize + 12, boardSize + sidePanelSize);
+
+        String hexColor = "#003399";
+        Color backgroundColor = Color.decode(hexColor);
+        getContentPane().setBackground(backgroundColor);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         startButton = new JButton("Play Game");
@@ -107,6 +114,9 @@ public class View extends JFrame {
 
         scoreLabel = new JLabel("Score: " + gameState.getScore());
         scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        scoreLabel.setBackground(Color.WHITE);
+        scoreLabel.setMaximumSize(new Dimension(sidePanelSize, 50));
+        scoreLabel.setOpaque(true);
         scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(scoreLabel, BorderLayout.NORTH);
 
@@ -200,7 +210,7 @@ public class View extends JFrame {
         });
         add(startButton);
 
-        gameGrid = new GameGrid(10, getWidth() - 300, getHeight(), new Point(300, 0), gameState);
+        gameGrid = new GameGrid(10, boardSize, boardSize, new Point(sidePanelSize, 0), gameState);
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
@@ -222,6 +232,9 @@ public class View extends JFrame {
 
         scoreLabel = new JLabel("Score: " + gameState.getScore());
         scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        scoreLabel.setBackground(Color.WHITE);
+        // scoreLabel.setMaximumSize(new Dimension(300, 50));
+        scoreLabel.setOpaque(true);
         scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(scoreLabel, BorderLayout.NORTH);
 
