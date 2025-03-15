@@ -25,7 +25,7 @@ class Client {
          BufferedImage bufferedImage = ImageIO.read(new File("./images/waterBackground.jpeg"));
          ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
-         // Create Vie  w and pass network streams
+         // Create Vie w and pass network streams
          gameView = new View(gameState, imageIcon, out);
          // Start listener thread to update the view
          // startListeningForUpdates();
@@ -58,6 +58,12 @@ class Client {
     */
 
    public static void main(String[] args) {
-      new Client("localhost", 12345); // Connect to server
+      String serverIP;
+      if (args.length > 0) {
+         serverIP = args[0];
+      } else {
+         serverIP = "localhost";
+      }
+      new Client(serverIP, 12345); // Connect to server
    }
 }

@@ -36,8 +36,7 @@ class ShipSquare extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // Always call the super method first
 
-        // if (!gameState.isPlayersTurn())
-        {
+        if (!gameState.isPlayersTurn() || gameState.getCanMoveShips()) {
             // Set the color for the square
             g.setColor(Color.GRAY);
 

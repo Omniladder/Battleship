@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 import java.awt.event.ActionListener;
 
@@ -63,14 +64,21 @@ public class View extends JFrame {
         setSize(boardSize + sidePanelSize, boardSize);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        startButton = new JButton("Click Me");
-        startButton.setPreferredSize(new Dimension(100,50));
-        startButton.setBounds(100,450,100,50);
+        startButton = new JButton("Play Game");
+        startButton.setPreferredSize(new Dimension(300, 150));
+        startButton.setBounds(50, 450, 150, 75);
+        startButton.setBackground(new Color(30, 144, 255)); // Button background
+        startButton.setForeground(Color.WHITE); // Text color
+        startButton.setBorderPainted(false);
+        startButton.setFocusPainted(false);
+        startButton.setFont(new Font("Arial", Font.BOLD, 16));
+        startButton.setBorder(new LineBorder(Color.WHITE, 2, true)); // White border, 2px, rounded
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 System.out.println("SHIPS SET IN PLACE");
                 gameState.setCanMoveShips(false);
+                startButton.setEnabled(false);
             }
         });
         add(startButton);
@@ -173,14 +181,21 @@ public class View extends JFrame {
         // removeAll();
         getContentPane().removeAll();
 
-        startButton = new JButton("Click Me");
-        startButton.setPreferredSize(new Dimension(100,50));
-        startButton.setBounds(100,450,100,50);
+        startButton = new JButton("Play Game");
+        startButton.setPreferredSize(new Dimension(300, 150));
+        startButton.setBounds(50, 450, 150, 75);
+        startButton.setBackground(new Color(30, 144, 255)); // Button background
+        startButton.setForeground(Color.WHITE); // Text color
+        startButton.setBorderPainted(false);
+        startButton.setFocusPainted(false);
+        startButton.setFont(new Font("Arial", Font.BOLD, 16));
+        startButton.setBorder(new LineBorder(Color.WHITE, 2, true)); // White border, 2px, rounded
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 System.out.println("SHIPS SET IN PLACE");
                 gameState.setCanMoveShips(false);
+                startButton.setEnabled(false);
             }
         });
         add(startButton);
@@ -207,7 +222,6 @@ public class View extends JFrame {
         scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
         scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(scoreLabel, BorderLayout.NORTH);
-
 
         // Creates Side Panel to Hold initial Ships
         gameSide = new SidePanel(300, getHeight());
