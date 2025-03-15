@@ -165,6 +165,21 @@ public class View extends JFrame {
                 gameState.printBoard();
                 renderView();
                 repaint();
+            } else {
+
+                if (!gameState.isPlayersTurn()) {
+                    return;
+                }
+
+                gameState.shoot(cellIndex[0], cellIndex[1]);
+                // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
+
+                // int[] cellPos = getCellPosition(cellIndex);
+
+                // setOpaque(false);
+                setVisible(true);
+                repaint();
+                gameState.waitForOpponent();
             }
 
             try {
