@@ -39,22 +39,6 @@ class Client {
       }
    }
 
-   /*
-    * private void startListeningForUpdates() {
-    * new Thread(() -> {
-    * try {
-    * while (true) {
-    * int[] position = (int[]) in.readObject();
-    * out.write(gameState.checkForHit(position[0], position[1]));
-    * out.flush();
-    * }
-    * } catch (Exception e) {
-    * e.printStackTrace();
-    * }
-    * }).start();
-    * }
-    */
-
    public static void main(String[] args) {
       String serverIP;
       if (args.length > 0) {

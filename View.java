@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -8,7 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.io.File;
 import java.io.ObjectInputStream;
+import java.awt.image.BufferedImage;
 import java.io.ObjectOutputStream;
 
 /**
@@ -98,7 +101,14 @@ public class View extends JFrame {
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
                 if (gameState.getYourBoardIndex(x, y) != Model.ShipType.EMPTY) {
-                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState);
+
+                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState, false);
+                    try {
+                        newSquare.assignImage(gameState.getShipPic(x, y));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     newSquare.addMouseListener(new UpdateScoreBar(gameState));
                     newSquare.setCellSquare(x, y);
                     add(newSquare);
@@ -232,7 +242,12 @@ public class View extends JFrame {
                 int[] cellIndex = { x, y };
                 Model.ShipType yourBoard = gameState.getYourBoardIndex(cellIndex[0], cellIndex[1]);
                 if (yourBoard != Model.ShipType.EMPTY) {
-                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState);
+                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState, true);
+                    try {
+                        newSquare.assignImage(gameState.getShipPic(x, y));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     newSquare.addMouseListener(new UpdateScoreBar(gameState));
                     newSquare.setCellSquare(x, y);
                     add(newSquare);
