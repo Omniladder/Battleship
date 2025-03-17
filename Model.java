@@ -48,6 +48,7 @@ public class Model {
 
     private ShipType[][] yourBoard = new ShipType[10][10]; // this is where your ships go
     private CellStatus[][] theirBoard = new CellStatus[10][10]; // this is where you track hits and misses
+    private CellStatus[][] yourHits = new CellStatus[10][10];
     private int CarrierLife = 5;
     private int BattleshipLife = 4;
     private int CruiserLife = 3;
@@ -110,6 +111,10 @@ public class Model {
 
     public int getScore() {
         return score;
+    }
+
+    public CellStatus getHitIndex(int x, int y) {
+        return yourHits[x][y];
     }
 
     private Image getShipImage(ShipType shipType, int index) {
@@ -202,8 +207,6 @@ public class Model {
     private BufferedImage rotateImage(BufferedImage originalImage) {
         // Create an AffineTransform for the rotation
         // Rotation information
-        System.out.println("Original Image: " + originalImage);
-
         double rotationRequired = Math.toRadians(-90);
         double locationX = originalImage.getWidth() / 2;
         double locationY = originalImage.getHeight() / 2;
@@ -365,6 +368,11 @@ public class Model {
                         System.out.println("Posistion " + i + " , " + firePosition[i]);
                     System.out.println(firePosition[0] + " , " + firePosition[1]); // ::ERROR:: Reading in enum
                     int[] result = { checkForHit(firePosition[0], firePosition[1]) };
+                    if (result[0] >= 0) {
+                        yourHits[firePosition[0]][firePosition[1]] = Model.CellStatus.HIT;
+                    } else {
+                        yourHits[firePosition[0]][firePosition[1]] = Model.CellStatus.MISS;
+                    }
                     out.writeObject(result);
                     out.flush();
                     playerMove = !playerMove;
@@ -469,6 +477,7 @@ public class Model {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 theirBoard[i][j] = CellStatus.DONTKNOW;
+                yourHits[i][j] = CellStatus.DONTKNOW;
             }
         }
     }
@@ -542,24 +551,6 @@ public class Model {
     }
 
     public ShipType[][] getYourBoardData() {
-        /*
-         * StringBuilder boardData = new StringBuilder();
-         * 
-         * // Loop through each row
-         * for (int i = 0; i < 10; i++) {
-         * // Loop through each column in the row
-         * for (int j = 0; j < 10; j++) {
-         * boardData.append(yourBoard[i][j].toString().charAt(0)); // Append the
-         * character (e.g., 'S' or '.')
-         * if (j < 10 - 1) {
-         * boardData.append(" "); // Add space between columns (optional)
-         * }
-         * }
-         * boardData.append("\n"); // Add a newline at the end of each row
-         * }
-         * 
-         * return boardData.toString(); // Return the board data as a string
-         */
         return yourBoard;
     }
 
@@ -568,24 +559,6 @@ public class Model {
     }
 
     public CellStatus[][] getTheirBoardData() {
-        /*
-         * StringBuilder boardData = new StringBuilder();
-         * 
-         * // Loop through each row
-         * for (int i = 0; i < 10; i++) {
-         * // Loop through each column in the row
-         * for (int j = 0; j < 10; j++) {
-         * boardData.append(theirBoard[i][j].toString().charAt(0)); // Append the
-         * character (e.g., 'S' or '.')
-         * if (j < 10 - 1) {
-         * boardData.append(" "); // Add space between columns (optional)
-         * }
-         * }
-         * boardData.append("\n"); // Add a newline at the end of each row
-         * }
-         * 
-         * return boardData.toString(); // Return the board data as a string
-         */
         return theirBoard;
     }
 

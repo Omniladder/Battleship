@@ -34,23 +34,7 @@ class GameGrid extends JComponent {
         this.addMouseListener(new ClickListener());
         this.gameState = gameState;
         removeAll();
-        renderShots();
-    }
 
-    private void renderShots() {
-        removeAll();
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                int[] cellIndex = { x, y };
-                Model.CellStatus theirBIndex = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
-                if (theirBIndex != Model.CellStatus.DONTKNOW && gameState.isPlayersTurn()) {
-                    Shot newShot = new Shot(theirBIndex, cellIndex, GameGrid.this);
-                    add(newShot);
-                    newShot.setVisible(true);
-                }
-            }
-        }
-        repaint();
     }
 
     @Override
@@ -80,6 +64,8 @@ class GameGrid extends JComponent {
             e.printStackTrace();
         }
 
+        renderShots();
+
         // Draws Grid rows
         for (int i = 0; i <= numOfCells; i++) {
             g2d.drawLine(left + i * cellWidth, top, left + i * cellWidth, boardHeight + top);
@@ -90,13 +76,36 @@ class GameGrid extends JComponent {
             g2d.drawLine(left, top + i * cellHeight, boardWidth + left, top + i * cellHeight);
         }
 
-        renderShots();
-
         /*
          * for (int i = 0; i < shots.size(); i++) {
          * shots.get(i).paintComponent(g2d);
          * }
          */
+    }
+
+    private void renderShots() {
+        removeAll();
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                int[] cellIndex = { x, y };
+                if (gameState.isPlayersTurn()) {
+                    Model.CellStatus theirBIndex = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
+                    if (theirBIndex != Model.CellStatus.DONTKNOW) {
+                        Shot newShot = new Shot(theirBIndex, cellIndex, GameGrid.this);
+                        add(newShot);
+                        newShot.setVisible(true);
+                    }
+                } else {
+                    Model.CellStatus yourBIndex = gameState.getHitIndex(cellIndex[0], cellIndex[1]);
+                    if (yourBIndex != Model.CellStatus.DONTKNOW) {
+                        Shot newShot = new Shot(yourBIndex, cellIndex, GameGrid.this);
+                        add(newShot);
+                        newShot.setVisible(true);
+                    }
+                }
+            }
+        }
+        repaint();
     }
 
     public int getCellWidth() {
