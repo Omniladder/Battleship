@@ -5,69 +5,47 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 class Client {
-    private Socket socket;
-    private ObjectOutputStream out; //passes from here: Client -> View -> ShipSquare
-    private ObjectInputStream in;
-    private View gameView;
+   private Socket socket;
+   private ObjectOutputStream out; // passes from here: Client -> View -> ShipSquare
+   private ObjectInputStream in;
+   private View gameView;
+   private Model gameState;
 
-    public Client(String serverIP, int port) {
-        try {
-            // Connect to Server
-            socket = new Socket(serverIP, port);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
+   public Client(String serverIP, int port) {
+      try {
+         // Connect to Server
+         socket = new Socket(serverIP, port);
+         out = new ObjectOutputStream(socket.getOutputStream());
+         in = new ObjectInputStream(socket.getInputStream());
 
-            // Initialize Game
-            Model gameState = new Model();
-            BufferedImage bufferedImage = ImageIO.read(new File("./images/waterBackground.jpeg"));
-            ImageIcon imageIcon = new ImageIcon(bufferedImage);
+         int[] playerNumberContainer = (int[]) in.readObject();
 
-            // Create View and pass network streams
-            gameView = new View(gameState, imageIcon,out);
-            // Start listener thread to update the view
-            startListeningForUpdates();
+         // Initialize Game
+         gameState = new Model(10, playerNumberContainer[0], out, in);
 
-        }
-            
-            
-        //     // Start sending updates
-        //     startSendingUpdates();
+         // Create Vie w and pass network streams
+         gameView = new View(gameState, out);
+         // Start listener thread to update the view
+         // startListeningForUpdates();
+         gameState.waitForOpponent();
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+      }
 
-    // private void startSendingUpdates() {
-    //     new Thread(() -> {
-    //         try {
-    //             while (true) {
-    //                 Thread.sleep(100); // Prevents excessive network spam
-    //                 int[] position = gameView.getShipSquarePosition(); // Pull from View
-                    
-    //                 out.writeObject(position);
-    //                 out.flush();
-    //             }
-    //         } catch (Exception e) {
-    //             e.printStackTrace();
-    //         }
-    //     }).start();
-    // }
+      // // Start sending updates
+      // startSendingUpdates();
 
-    private void startListeningForUpdates() {
-        new Thread(() -> {
-            try {
-                while (true) {
-                    int[] position = (int[]) in.readObject();
-                    gameView.updateShipSquarePosition(position[0], position[1]); // Update View
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
+      catch (Exception e) {
+         e.printStackTrace();
+      }
+   }
 
-    public static void main(String[] args) {
-        new Client("localhost", 12345); // Connect to server
-    }
+   public static void main(String[] args) {
+      String serverIP;
+      if (args.length > 0) {
+         serverIP = args[0];
+      } else {
+         serverIP = "localhost";
+      }
+      new Client(serverIP, 12345); // Connect to server
+   }
 }

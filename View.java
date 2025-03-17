@@ -1,5 +1,17 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+
+import java.awt.event.ActionListener;
+
+//import Model.ShipType;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.awt.image.BufferedImage;
 import java.io.ObjectOutputStream;
 
 /**
@@ -35,42 +47,177 @@ class SidePanel extends JComponent {
 
 public class View extends JFrame {
     Model gameState;
+    boolean isClicked = false;
     ShipSquare testSquare;
-    ObjectOutputStream out; //this is passed in from client, and passed to shipsquare, to send coordinates
+    ObjectOutputStream out; // this is passed in from client, and passed to shipsquare, to send coordinates
+    String logMessage = "Place Your Ships";
+
+    int xa, ya;
+    int xb, yb;
+    int[] cellIndexStarting;
 
     SidePanel gameSide;
     GameGrid gameGrid;
+    JLabel scoreLabel;
+    JLabel logBox;
+    
+    JButton startButton;
 
-    View(Model gameState, ImageIcon backgroundImage,ObjectOutputStream out) {
+    int boardSize;
+    int sidePanelSize;
 
-        int boardSize = 950;
+    View(Model gameState, ObjectOutputStream out) {
 
-        int sidePanelSize = 300;
-        setSize(boardSize + sidePanelSize, boardSize);
+        boardSize = 1000;
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        sidePanelSize = 300;
+        setSize(boardSize + sidePanelSize + 12, boardSize + sidePanelSize);
 
-        gameGrid = new GameGrid(8, getWidth() - sidePanelSize, getHeight(), new Point(sidePanelSize, 0));
-        add(gameGrid);
-        setVisible(true);
+        String hexColor = "#003399";
+        Color backgroundColor = Color.decode(hexColor);
+        getContentPane().setBackground(backgroundColor);
+        this.gameState = gameState;
+        gameState.setLog("Place Your Ships");
+        renderView();
+    }
 
-        // Creates test Square to be used as ship
-        testSquare = new ShipSquare(gameGrid, out);
-        add(testSquare);
+    private class UpdateScoreBar extends MouseAdapter {
+        Model gameState;
 
-        setVisible(true);
+        UpdateScoreBar(Model gameState) {
+            this.gameState = gameState;
+        }
 
-        // Creates Side Panel to Hold initial Ships
-        gameSide = new SidePanel(sidePanelSize, getHeight());
-        add(gameSide);
+        @Override
+        public void mousePressed(MouseEvent e) {
+            // Remove existing top bar
+            // get mouse x and y
+            Point p = e.getPoint();
+            int[] pcoords = gameGrid.getCellInside(p);
+            xa = pcoords[0];
+            ya = pcoords[1];
+            // get cell index
+            cellIndexStarting = gameGrid.getCellInside(new Point(xa, ya));
+            scoreLabel.setText("Score: " + gameState.getScore());
+            repaint(); // Redraw UI
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent event) {
+            Point clickedLocation = event.getPoint();
+            int[] cellIndex = gameGrid.getCellInside(clickedLocation);
+            if (cellIndex[0] == -1) {
+                return;
+            }
+
+            // ships are not placed. we can do stuff
+            if (gameState.getCanMoveShips()) {
+                gameState.moveShipFromAtoB(xa, ya, cellIndex[0], cellIndex[1]);
+                renderView();
+                repaint();
+            } else {
+
+                Model.CellStatus clickedType = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
+
+                if (!gameState.isPlayersTurn() || clickedType != Model.CellStatus.DONTKNOW) {
+                    return;
+                }
+
+                gameState.shoot(cellIndex[0], cellIndex[1]);
+                renderView();
+                setVisible(true);
+                repaint();
+                gameState.waitForOpponent();
+            }
+
+        }
 
     }
+
     // Method for client to get current position
     public int[] getShipSquarePosition() {
-        return new int[]{testSquare.getXPosition(), testSquare.getYPosition()};
+        return new int[] { testSquare.getXPosition(), testSquare.getYPosition() };
     }
-    //Method for view to be updated by client
+
+    // Method for view to be updated by client
     public void updateShipSquarePosition(int x, int y) {
         testSquare.setPosition(x, y);
     }
+
+    public void updateLogMessage(String message){
+        logMessage = message;
+        renderView();
+    }
+
+    public void renderView() {
+        // removeAll();
+        getContentPane().removeAll();
+
+        startButton = new JButton("Play Game");
+        startButton.setPreferredSize(new Dimension(300, 150));
+        startButton.setBounds(50, 450, 150, 75);
+        startButton.setBackground(new Color(30, 144, 255)); // Button background
+        startButton.setForeground(Color.WHITE); // Text color
+        startButton.setBorderPainted(false);
+        startButton.setFocusPainted(false);
+        startButton.setFont(new Font("Arial", Font.BOLD, 16));
+        startButton.setBorder(new LineBorder(Color.WHITE, 2, true)); // White border, 2px, rounded
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                gameState.setCanMoveShips(false);
+                startButton.setEnabled(false);
+            }
+        });
+        add(startButton);
+
+        gameGrid = new GameGrid(10, boardSize, boardSize, new Point(sidePanelSize, 0), gameState);
+
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                int[] cellIndex = { x, y };
+                Model.ShipType yourBoard = gameState.getYourBoardIndex(cellIndex[0], cellIndex[1]);
+                if (yourBoard != Model.ShipType.EMPTY) {
+                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState, true);
+                    try {
+                        newSquare.assignImage(gameState.getShipPic(x, y));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    newSquare.addMouseListener(new UpdateScoreBar(gameState));
+                    newSquare.setCellSquare(x, y);
+                    add(newSquare);
+                    setVisible(true);
+                }
+            }
+        }
+
+        add(gameGrid);
+        setVisible(true);
+        gameGrid.addMouseListener(new UpdateScoreBar(gameState));
+
+        scoreLabel = new JLabel("Score: " + gameState.getScore());
+        scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        scoreLabel.setBackground(Color.WHITE);
+        // scoreLabel.setMaximumSize(new Dimension(300, 50));
+        scoreLabel.setOpaque(true);
+        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        add(scoreLabel, BorderLayout.NORTH);
+
+        logBox = new JLabel(gameState.getLog());
+        logBox.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        logBox.setBackground(Color.WHITE);
+        logBox.setOpaque(true);
+        logBox.setFont(new Font("SansSerif", Font.BOLD, 24));
+        add(logBox, BorderLayout.SOUTH);
+
+        // Creates Side Panel to Hold initial Ships
+        gameSide = new SidePanel(300, getHeight());
+        add(gameSide);
+
+        repaint();
+        revalidate();
+
+    }
+
 }

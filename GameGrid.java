@@ -1,5 +1,17 @@
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
+
 import java.awt.*;
+
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.event.MouseAdapter;
 
 class GameGrid extends JComponent {
     int numOfCells;
@@ -7,8 +19,11 @@ class GameGrid extends JComponent {
     int top, left;
     int cellWidth, cellHeight;
     int strokeSize = 5;
+    Model gameState;
 
-    GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft) {
+    List<Shot> shots = new ArrayList<>();
+
+    GameGrid(int numOfCells, int boardWidth, int boardHeight, Point topLeft, Model gameState) {
         this.numOfCells = numOfCells;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
@@ -16,6 +31,9 @@ class GameGrid extends JComponent {
         top = topLeft.y + strokeSize;
         this.cellHeight = boardHeight / numOfCells;
         this.cellWidth = boardWidth / numOfCells;
+        this.gameState = gameState;
+        removeAll();
+
     }
 
     @Override
@@ -25,6 +43,28 @@ class GameGrid extends JComponent {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(strokeSize));
+
+        try {
+            // Load the image
+            File waterFile = new File("images/water.jpg");
+            BufferedImage waterBackground = ImageIO.read(waterFile);
+            // Set position and size
+
+            for (int x = 0; x < numOfCells; x++) {
+                for (int y = 0; y < numOfCells; y++) {
+                    g2d.drawImage(waterBackground, left + x * cellWidth, top + y * cellHeight, cellWidth, cellHeight,
+                            this);
+                }
+            }
+
+        } catch (Exception e) {
+            // System.err.println("Attempted to load from: " + new
+            // File("./images/water.jpg").getAbsolutePath());
+            e.printStackTrace();
+        }
+
+        renderShots();
+
         // Draws Grid rows
         for (int i = 0; i <= numOfCells; i++) {
             g2d.drawLine(left + i * cellWidth, top, left + i * cellWidth, boardHeight + top);
@@ -35,6 +75,31 @@ class GameGrid extends JComponent {
             g2d.drawLine(left, top + i * cellHeight, boardWidth + left, top + i * cellHeight);
         }
 
+    }
+
+    private void renderShots() {
+        removeAll();
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 10; y++) {
+                int[] cellIndex = { x, y };
+                if (gameState.isPlayersTurn()) {
+                    Model.CellStatus theirBIndex = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
+                    if (theirBIndex != Model.CellStatus.DONTKNOW) {
+                        Shot newShot = new Shot(theirBIndex, cellIndex, GameGrid.this);
+                        add(newShot);
+                        newShot.setVisible(true);
+                    }
+                } else {
+                    Model.CellStatus yourBIndex = gameState.getHitIndex(cellIndex[0], cellIndex[1]);
+                    if (yourBIndex != Model.CellStatus.DONTKNOW) {
+                        Shot newShot = new Shot(yourBIndex, cellIndex, GameGrid.this);
+                        add(newShot);
+                        newShot.setVisible(true);
+                    }
+                }
+            }
+        }
+        repaint();
     }
 
     public int getCellWidth() {
@@ -76,4 +141,5 @@ class GameGrid extends JComponent {
         index[1] = cellIndex[1] * cellHeight + top;
         return index;
     }
+
 }

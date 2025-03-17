@@ -1,0 +1,22 @@
+@startuml
+class Model {
+    - char[][] gameBoard
+    - int boardSize
+    - boolean playerMove
+    - int score
+    + Model(int boardSize)
+    - addShipSquare(int x, int y) : void
+    - removeShipSquare(int x, int y) : void
+    - isValidShipLocation(int shipTop, int shipLeft, int shipSize, boolean direction) : boolean
+    - addShipRandom(int shipSize) : void
+    + getCellState(int x, int y) : char
+    + fireShot(int x, int y) : void
+    + getScore() : int
+    + setShipsRandom() : void
+    + printBoard() : void
+}
+
+Model --> Random : "Uses"
+
+
+@enduml
