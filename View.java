@@ -177,7 +177,10 @@ public class View extends JFrame {
                 repaint();
             } else {
 
-                if (!gameState.isPlayersTurn()) {
+                Model.CellStatus clickedType = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
+                System.out.println("Clicked Type: " + clickedType);
+                
+                if (!gameState.isPlayersTurn() || clickedType != Model.CellStatus.DONTKNOW) {
                     return;
                 }
 

@@ -338,6 +338,7 @@ public class Model {
 
     public void shoot(int row, int col) {
         int[] firePosition = { row, col };
+        System.out.println("Fired Shot Row: " + row + " Column: " + col);
         try {
             out.writeObject(firePosition);
             out.flush();

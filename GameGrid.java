@@ -148,25 +148,4 @@ class GameGrid extends JComponent {
         return index;
     }
 
-    private class ClickListener extends MouseAdapter {
-        public void mousePressed(MouseEvent event) {
-            // ships are set in place. now we can play
-            if (!gameState.getCanMoveShips()) {
-                int[] cellIndex = getCellInside(event.getPoint());
-                if (cellIndex[0] == -1 || !gameState.isPlayersTurn()) {
-                    return;
-                }
-
-                gameState.shoot(cellIndex[0], cellIndex[1]);
-                // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
-
-                // int[] cellPos = getCellPosition(cellIndex);
-
-                // setOpaque(false);
-                setVisible(true);
-                repaint();
-                gameState.waitForOpponent();
-            }
-        }
-    }
 }
