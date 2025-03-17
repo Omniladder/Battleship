@@ -31,7 +31,6 @@ class GameGrid extends JComponent {
         top = topLeft.y + strokeSize;
         this.cellHeight = boardHeight / numOfCells;
         this.cellWidth = boardWidth / numOfCells;
-        this.addMouseListener(new ClickListener());
         this.gameState = gameState;
         removeAll();
 
@@ -76,11 +75,6 @@ class GameGrid extends JComponent {
             g2d.drawLine(left, top + i * cellHeight, boardWidth + left, top + i * cellHeight);
         }
 
-        /*
-         * for (int i = 0; i < shots.size(); i++) {
-         * shots.get(i).paintComponent(g2d);
-         * }
-         */
     }
 
     private void renderShots() {

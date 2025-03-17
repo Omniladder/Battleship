@@ -85,36 +85,3 @@ public class Server extends JFrame {
    }
 }
 
-//// The ClientHandler class manages communication for one client.
-//// It reads messages from its client and sends them to the opponent's socket.
-// class ClientHandler implements Runnable {
-// private Socket mySocket; // this client's socket
-// private Socket opponentSocket; // the opponent's socket
-//
-// public ClientHandler(Socket mySocket, Socket opponentSocket) {
-// this.mySocket = mySocket;
-// this.opponentSocket = opponentSocket;
-// }
-//
-// public void run() {
-// try {
-// // Create streams:
-// // 'input' reads messages from mySocket.
-// ObjectInputStream input = new ObjectInputStream(mySocket.getInputStream());
-// // 'output' sends messages to the opponent.
-// ObjectOutputStream output = new
-// ObjectOutputStream(opponentSocket.getOutputStream());
-//
-// String message;
-// // Continuously read messages from this client.
-// while ((message = (String) input.readObject()) != null) {
-// System.out.println("Received: " + message);
-// // Relay the received message to the opponent.
-// output.writeObject(message);
-// output.flush();
-// }
-// } catch (IOException | ClassNotFoundException e) {
-// System.out.println("A player disconnected.");
-// }
-// }
-// }

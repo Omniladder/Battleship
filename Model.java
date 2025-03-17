@@ -164,7 +164,6 @@ public class Model {
                 row = rand.nextInt(10 - size); // Ensure ship fits within bounds
                 col = rand.nextInt(10); // Random column
             }
-            System.out.println("Row: " + row + " Col: " + col);
 
             canPlace = true;
             for (int i = 0; i < size; i++) {
@@ -187,7 +186,6 @@ public class Model {
                     BattleShips.get(shipListIndex).isHorizontal = true;
                     // get correct ship --> access coords list --> get specific coord --> set it
                     BattleShips.get(shipListIndex).setShipPoint(row, col + i, i);
-                    System.out.println("Placed " + s + " at (" + row + ", " + (col + i) + ")");
                     yourBoard[row][col + i] = s;
                     shipPics[row][col + i] = ((BufferedImage) getShipImage(s, i));
                 } else {
@@ -195,7 +193,6 @@ public class Model {
                     BattleShips.get(shipListIndex).setShipPoint(row + i, col, i);
                     // BattleShips.get(shipListIndex).x_coords.set(i,row+i);
                     // BattleShips.get(shipListIndex).y_coords.set(i,col);
-                    System.out.println("Placed " + s + " at (" + (row + i) + ", " + col + ")");
                     yourBoard[row + i][col] = s;
                     shipPics[row + i][col] = rotateImage((BufferedImage) getShipImage(s, i));
                 }
@@ -275,7 +272,6 @@ public class Model {
                 // make it go somewhere else");
                 return false;
             }
-            System.out.println(new_x + " " + new_y);
             BattleShips.get(BattleShipsIndex).setNewCoords(j, new Point(new_x, new_y));
             // check if new points are valid. no index out of bounds, and no ship already
             // there
@@ -289,7 +285,6 @@ public class Model {
             {
                 // clear transferred points
                 BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
-                System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or make it go somewhere else");
                 return false;
             }
         }
@@ -338,13 +333,10 @@ public class Model {
 
     public void shoot(int row, int col) {
         int[] firePosition = { row, col };
-        System.out.println("Fired Shot Row: " + row + " Column: " + col);
         try {
             out.writeObject(firePosition);
             out.flush();
-            System.out.println("Before Read IN");
             int[] result = (int[]) in.readObject();
-            System.out.println("After Read IN");
             printSinkMessage(result[0]);
             if (result[0] >= 0) {
                 theirBoard[row][col] = Model.CellStatus.HIT;
@@ -352,7 +344,6 @@ public class Model {
                 theirBoard[row][col] = Model.CellStatus.MISS;
             }
             playerMove = !playerMove;
-            System.out.println("Player Move: " + playerMove);
 
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error: " + e);
@@ -361,13 +352,10 @@ public class Model {
 
     public void waitForOpponent() {
         new Thread(() -> {
-            System.out.println("Player Move: " + playerMove);
+
             while (!playerMove) {
                 try {
                     int[] firePosition = (int[]) in.readObject();
-                    for (int i = 0; i < firePosition.length; i++)
-                        System.out.println("Posistion " + i + " , " + firePosition[i]);
-                    System.out.println(firePosition[0] + " , " + firePosition[1]); // ::ERROR:: Reading in enum
                     int[] result = { checkForHit(firePosition[0], firePosition[1]) };
                     if (result[0] >= 0) {
                         yourHits[firePosition[0]][firePosition[1]] = Model.CellStatus.HIT;
@@ -454,7 +442,6 @@ public class Model {
     public void processScoreData(int row, int col, int hitData) // when you find out you got a hit, this is how you
                                                                 // process that and change your board.
     { // there should be a subsequent call in controller to send boardState to view
-        System.out.println(hitData);
         if (hitData >= 0) {
             score++;
             theirBoard[row][col] = CellStatus.HIT;

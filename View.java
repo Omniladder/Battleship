@@ -86,7 +86,6 @@ public class View extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                System.out.println("SHIPS SET IN PLACE");
                 gameState.setCanMoveShips(false);
                 startButton.setEnabled(false);
             }
@@ -152,7 +151,6 @@ public class View extends JFrame {
             ya = pcoords[1];
             // get cell index
             cellIndexStarting = gameGrid.getCellInside(new Point(xa, ya));
-            System.out.println("Mouse Pressed at: " + xa + ", " + ya);
             scoreLabel.setText("Score: " + gameState.getScore());
             System.out.println("Score: " + gameState.getScore());
             repaint(); // Redraw UI
@@ -161,46 +159,30 @@ public class View extends JFrame {
         @Override
         public void mouseReleased(MouseEvent event) {
             Point clickedLocation = event.getPoint();
-            System.out.println("Mouse Released at: " + clickedLocation.getX() + ", " + clickedLocation.getY());
             int[] cellIndex = gameGrid.getCellInside(clickedLocation);
-            System.out.println("Cell Index: " + cellIndex[0] + ", " + cellIndex[1]);
             if (cellIndex[0] == -1) {
                 return;
             }
 
-            // int[] cellLocation = gameGrid.getCellPosition(cellIndex);
             // ships are not placed. we can do stuff
             if (gameState.getCanMoveShips()) {
                 gameState.moveShipFromAtoB(xa, ya, cellIndex[0], cellIndex[1]);
-                gameState.printBoard();
                 renderView();
                 repaint();
             } else {
 
                 Model.CellStatus clickedType = gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]);
-                System.out.println("Clicked Type: " + clickedType);
-                
+
                 if (!gameState.isPlayersTurn() || clickedType != Model.CellStatus.DONTKNOW) {
                     return;
                 }
 
                 gameState.shoot(cellIndex[0], cellIndex[1]);
-                // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
-
-                // int[] cellPos = getCellPosition(cellIndex);
-
-                // setOpaque(false);
                 setVisible(true);
                 repaint();
                 gameState.waitForOpponent();
             }
 
-            try {
-                // out.writeObject(new int[] { xPos, yPos });
-                // out.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
     }
@@ -231,7 +213,6 @@ public class View extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                System.out.println("SHIPS SET IN PLACE");
                 gameState.setCanMoveShips(false);
                 startButton.setEnabled(false);
             }
