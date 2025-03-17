@@ -31,7 +31,6 @@ class GameGrid extends JComponent {
         top = topLeft.y + strokeSize;
         this.cellHeight = boardHeight / numOfCells;
         this.cellWidth = boardWidth / numOfCells;
-        this.addMouseListener(new ClickListener());
         this.gameState = gameState;
         removeAll();
 
@@ -76,11 +75,6 @@ class GameGrid extends JComponent {
             g2d.drawLine(left, top + i * cellHeight, boardWidth + left, top + i * cellHeight);
         }
 
-        /*
-         * for (int i = 0; i < shots.size(); i++) {
-         * shots.get(i).paintComponent(g2d);
-         * }
-         */
     }
 
     private void renderShots() {
@@ -148,25 +142,4 @@ class GameGrid extends JComponent {
         return index;
     }
 
-    private class ClickListener extends MouseAdapter {
-        public void mousePressed(MouseEvent event) {
-            // ships are set in place. now we can play
-            if (!gameState.getCanMoveShips()) {
-                int[] cellIndex = getCellInside(event.getPoint());
-                if (cellIndex[0] == -1 || !gameState.isPlayersTurn()) {
-                    return;
-                }
-
-                gameState.shoot(cellIndex[0], cellIndex[1]);
-                // System.out.println(gameState.getTheirBoardIndex(cellIndex[0], cellIndex[1]));
-
-                // int[] cellPos = getCellPosition(cellIndex);
-
-                // setOpaque(false);
-                setVisible(true);
-                repaint();
-                gameState.waitForOpponent();
-            }
-        }
-    }
 }
