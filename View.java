@@ -50,13 +50,17 @@ public class View extends JFrame {
     boolean isClicked = false;
     ShipSquare testSquare;
     ObjectOutputStream out; // this is passed in from client, and passed to shipsquare, to send coordinates
+    String logMessage = "Place Your Ships";
 
     int xa, ya;
     int xb, yb;
+    int[] cellIndexStarting;
+
     SidePanel gameSide;
     GameGrid gameGrid;
     JLabel scoreLabel;
-    int[] cellIndexStarting;
+    JLabel logBox;
+    
     JButton startButton;
 
     int boardSize;
@@ -72,66 +76,9 @@ public class View extends JFrame {
         String hexColor = "#003399";
         Color backgroundColor = Color.decode(hexColor);
         getContentPane().setBackground(backgroundColor);
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        startButton = new JButton("Play Game");
-        startButton.setPreferredSize(new Dimension(300, 150));
-        startButton.setBounds(50, 450, 150, 75);
-        startButton.setBackground(new Color(30, 144, 255)); // Button background
-        startButton.setForeground(Color.WHITE); // Text color
-        startButton.setBorderPainted(false);
-        startButton.setFocusPainted(false);
-        startButton.setFont(new Font("Arial", Font.BOLD, 16));
-        startButton.setBorder(new LineBorder(Color.WHITE, 2, true)); // White border, 2px, rounded
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                gameState.setCanMoveShips(false);
-                startButton.setEnabled(false);
-            }
-        });
-        add(startButton);
-
-        // Creates test Square to be used as ship
-        // testSquare = new ShipSquare(gameGrid, out,);
-        // add(testSquare);
-        gameGrid = new GameGrid(10, boardSize, boardSize, new Point(sidePanelSize, 0), gameState);
-        // updateView();
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                if (gameState.getYourBoardIndex(x, y) != Model.ShipType.EMPTY) {
-
-                    ShipSquare newSquare = new ShipSquare(gameGrid, out, gameState, false);
-                    try {
-                        newSquare.assignImage(gameState.getShipPic(x, y));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    newSquare.addMouseListener(new UpdateScoreBar(gameState));
-                    newSquare.setCellSquare(x, y);
-                    add(newSquare);
-                    setVisible(true);
-                }
-            }
-        }
-
-        add(gameGrid);
-        setVisible(true);
         this.gameState = gameState;
-        gameGrid.addMouseListener(new UpdateScoreBar(gameState));
-
-        scoreLabel = new JLabel("Score: " + gameState.getScore());
-        scoreLabel.setForeground(Color.BLACK); // Makes the text stand out on the dark background
-        scoreLabel.setBackground(Color.WHITE);
-        scoreLabel.setMaximumSize(new Dimension(sidePanelSize, 50));
-        scoreLabel.setOpaque(true);
-        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
-        add(scoreLabel, BorderLayout.NORTH);
-
-        // Creates Side Panel to Hold initial Ships
-        gameSide = new SidePanel(sidePanelSize, getHeight());
-        add(gameSide);
+        gameState.setLog("Place Your Ships");
+        renderView();
     }
 
     private class UpdateScoreBar extends MouseAdapter {
@@ -152,7 +99,6 @@ public class View extends JFrame {
             // get cell index
             cellIndexStarting = gameGrid.getCellInside(new Point(xa, ya));
             scoreLabel.setText("Score: " + gameState.getScore());
-            System.out.println("Score: " + gameState.getScore());
             repaint(); // Redraw UI
         }
 
@@ -196,6 +142,11 @@ public class View extends JFrame {
     // Method for view to be updated by client
     public void updateShipSquarePosition(int x, int y) {
         testSquare.setPosition(x, y);
+    }
+
+    public void updateLogMessage(String message){
+        logMessage = message;
+        renderView();
     }
 
     public void renderView() {
@@ -252,6 +203,13 @@ public class View extends JFrame {
         scoreLabel.setOpaque(true);
         scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(scoreLabel, BorderLayout.NORTH);
+
+        logBox = new JLabel(gameState.getLog());
+        logBox.setForeground(Color.BLACK); // Makes the text stand out on the dark background
+        logBox.setBackground(Color.WHITE);
+        logBox.setOpaque(true);
+        logBox.setFont(new Font("SansSerif", Font.BOLD, 24));
+        add(logBox, BorderLayout.SOUTH);
 
         // Creates Side Panel to Hold initial Ships
         gameSide = new SidePanel(300, getHeight());

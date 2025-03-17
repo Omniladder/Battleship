@@ -65,6 +65,7 @@ public class Model {
 
     int boardSize;
     boolean playerMove;
+    private String logMessage;
 
     Model(int boardSize, int playerNumber, ObjectOutputStream out, ObjectInputStream in) {
         this.boardSize = boardSize;
@@ -99,6 +100,14 @@ public class Model {
         emptyYourBoard();
         setYourBoard();
 
+    }
+
+    public void setLog(String logMessage) {
+        this.logMessage = logMessage;
+    }
+
+    public String getLog(){
+        return logMessage;
     }
 
     public boolean getCanMoveShips() {
@@ -341,9 +350,10 @@ public class Model {
             if (result[0] >= 0) {
                 theirBoard[row][col] = Model.CellStatus.HIT;
                 score++;
-                System.out.println("Score: " + score);
+                logMessage = "You HIT";
             } else {
                 theirBoard[row][col] = Model.CellStatus.MISS;
+                logMessage = "You MISSED";
             }
             playerMove = !playerMove;
 
@@ -416,25 +426,24 @@ public class Model {
                                                    // display
         switch (hitResult) {
             case -1:
-                System.out.println("Miss!");
+                logMessage = "Miss!"; 
                 break;
             case 0:
-                System.out.println("Hit!");
                 break;
             case 1:
-                System.out.println("You sunk the Destroyer!");
+                logMessage = "You sunk the Destroyer!";
                 break;
             case 2:
-                System.out.println("You sunk the Submarine!");
+                logMessage = "You sunk the Submarine!";
                 break;
             case 3:
-                System.out.println("You sunk the Cruiser!");
+                logMessage = "You sunk the Cruiser!";
                 break;
             case 4:
-                System.out.println("You sunk the Battleship!");
+                logMessage = "You sunk the Battleship!";
                 break;
             case 5:
-                System.out.println("You sunk the Carrier!");
+                logMessage = "You sunk the Carrier!";
                 break;
             default:
                 System.out.println("Invalid hit result.");
