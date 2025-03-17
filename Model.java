@@ -19,6 +19,7 @@ import java.util.Random;
 
 import java.awt.image.AffineTransformOp;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import java.awt.geom.AffineTransform;
 
 public class Model {
@@ -58,6 +59,8 @@ public class Model {
     ArrayList<Ship> BattleShips = new ArrayList<>(); // this list of battleships contains ship classes
                                                      // these contain x and y coords for translating ship stuff
 
+    Clip explosionClip;
+    Clip splashClip;
     int score = 0;
 
     ObjectOutputStream out;
@@ -94,6 +97,9 @@ public class Model {
 
         destroyerPics[0] = getImage("images/Destroyer1.png");
         destroyerPics[1] = getImage("images/Destroyer2.png");
+
+        explosionClip = getSound("sound/hit.wav");
+        splashClip = getSound("sound/miss.wav");
 
         setTheirBoard();
         emptyYourBoard();
@@ -144,6 +150,19 @@ public class Model {
             e.getStackTrace();
         }
         return null;
+    }
+
+    private Clip getSound(String soundPath) {
+        try {
+            File soundFile = new File(soundPath);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioStream);
+            return clip;
+        } catch (Exception e) {
+            e.getStackTrace();
+            return null;
+        }
     }
 
     public Image getShipPic(int x, int y) {
