@@ -42,7 +42,7 @@ class Shot extends JComponent {
         // Draw a square (x, y, width, height)
         // g.fillOval(index[0], index[1], gameGrid.getCellWidth(),
         // gameGrid.getCellHeight()); // x=100, y=100, size=100x100
-        g.fillOval(0, 0, gameGrid.getCellWidth(), gameGrid.getCellHeight());
+        g.fillOval(2, 2, gameGrid.getCellWidth() - 5, gameGrid.getCellHeight() - 5);
 
     }
 
