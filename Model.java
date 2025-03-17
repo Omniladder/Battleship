@@ -340,6 +340,8 @@ public class Model {
             printSinkMessage(result[0]);
             if (result[0] >= 0) {
                 theirBoard[row][col] = Model.CellStatus.HIT;
+                score++;
+                System.out.println("Score: " + score);
             } else {
                 theirBoard[row][col] = Model.CellStatus.MISS;
             }
@@ -348,6 +350,7 @@ public class Model {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error: " + e);
         }
+        
     }
 
     public void waitForOpponent() {
@@ -438,7 +441,7 @@ public class Model {
                 break;
         }
     }
-
+/* 
     public void processScoreData(int row, int col, int hitData) // when you find out you got a hit, this is how you
                                                                 // process that and change your board.
     { // there should be a subsequent call in controller to send boardState to view
@@ -452,7 +455,7 @@ public class Model {
         // printSinkMessage(hitData); // doesnt necessarily require sink, but prints
         // hit, miss, sink stuff
     }
-
+*/
     public void setHit(int row, int col) {
         theirBoard[row][col] = CellStatus.HIT;
     }

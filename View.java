@@ -178,6 +178,7 @@ public class View extends JFrame {
                 }
 
                 gameState.shoot(cellIndex[0], cellIndex[1]);
+                renderView();
                 setVisible(true);
                 repaint();
                 gameState.waitForOpponent();
