@@ -112,7 +112,7 @@ public class Model {
         this.logMessage = logMessage;
     }
 
-    public String getLog(){
+    public String getLog() {
         return logMessage;
     }
 
@@ -370,16 +370,20 @@ public class Model {
                 theirBoard[row][col] = Model.CellStatus.HIT;
                 score++;
                 logMessage = "You HIT";
+                explosionClip.start();
+                explosionClip = getSound("sound/hit.wav");
             } else {
                 theirBoard[row][col] = Model.CellStatus.MISS;
                 logMessage = "You MISSED";
+                splashClip.start();
+                splashClip = getSound("sound/miss.wav");
             }
             playerMove = !playerMove;
 
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error: " + e);
         }
-        
+
     }
 
     public void waitForOpponent() {
@@ -445,7 +449,7 @@ public class Model {
                                                    // display
         switch (hitResult) {
             case -1:
-                logMessage = "Miss!"; 
+                logMessage = "Miss!";
                 break;
             case 0:
                 break;
@@ -469,21 +473,24 @@ public class Model {
                 break;
         }
     }
-/* 
-    public void processScoreData(int row, int col, int hitData) // when you find out you got a hit, this is how you
-                                                                // process that and change your board.
-    { // there should be a subsequent call in controller to send boardState to view
-        if (hitData >= 0) {
-            score++;
-            theirBoard[row][col] = CellStatus.HIT;
-        } else {
-            theirBoard[row][col] = CellStatus.MISS;
-        }
 
-        // printSinkMessage(hitData); // doesnt necessarily require sink, but prints
-        // hit, miss, sink stuff
-    }
-*/
+    /*
+     * public void processScoreData(int row, int col, int hitData) // when you find
+     * out you got a hit, this is how you
+     * // process that and change your board.
+     * { // there should be a subsequent call in controller to send boardState to
+     * view
+     * if (hitData >= 0) {
+     * score++;
+     * theirBoard[row][col] = CellStatus.HIT;
+     * } else {
+     * theirBoard[row][col] = CellStatus.MISS;
+     * }
+     * 
+     * // printSinkMessage(hitData); // doesnt necessarily require sink, but prints
+     * // hit, miss, sink stuff
+     * }
+     */
     public void setHit(int row, int col) {
         theirBoard[row][col] = CellStatus.HIT;
     }
