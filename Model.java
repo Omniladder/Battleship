@@ -369,12 +369,12 @@ public class Model {
             if (result[0] >= 0) {
                 theirBoard[row][col] = Model.CellStatus.HIT;
                 score++;
-                logMessage = "You HIT";
+                logMessage = "HIT";
                 explosionClip.start();
                 explosionClip = getSound("sound/hit.wav");
             } else {
                 theirBoard[row][col] = Model.CellStatus.MISS;
-                logMessage = "You MISSED";
+                logMessage = "MISSED";
                 splashClip.start();
                 splashClip = getSound("sound/miss.wav");
             }
@@ -449,7 +449,6 @@ public class Model {
                                                    // display
         switch (hitResult) {
             case -1:
-                logMessage = "Miss!";
                 break;
             case 0:
                 break;
