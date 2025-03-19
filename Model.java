@@ -227,6 +227,43 @@ public class Model {
         // something
     }
 
+    public boolean rotateShip(int xa, int ya) // index coordinates. Rotate ship clockwise about this point
+    {
+        // if game has started, dont allow ships to move
+        if (!canMoveShips) {
+            return false;
+        }
+        ShipType translatedShipType = yourBoard[xa][ya];
+        int BattleShipsIndex = -1;
+        // find the index in BattleShips (model arraylist) based on shipytype
+        switch (translatedShipType) {
+            case CARRIER:
+                BattleShipsIndex = 0;
+                break;
+            case BATTLESHIP:
+                BattleShipsIndex = 1;
+                break;
+            case CRUISER:
+                BattleShipsIndex = 2;
+                break;
+            case SUBMARINE:
+                BattleShipsIndex = 3;
+                break;
+            case DESTROYER:
+                BattleShipsIndex = 4;
+                break;
+            case EMPTY:
+                return false;
+            default:
+                System.out.println("Something aint right");
+                break;
+        }
+        
+        //handle horizontal ship
+        
+
+        return false;
+    }
     public boolean isPlayersTurn() {
         return playerMove;
     }
