@@ -22,11 +22,9 @@ class Client {
 
          // Initialize Game
          gameState = new Model(10, playerNumberContainer[0], out, in);
-         BufferedImage bufferedImage = ImageIO.read(new File("./images/waterBackground.jpeg"));
-         ImageIcon imageIcon = new ImageIcon(bufferedImage);
 
-         // Create Vie  w and pass network streams
-         gameView = new View(gameState, imageIcon, out);
+         // Create Vie w and pass network streams
+         gameView = new View(gameState, out);
          // Start listener thread to update the view
          // startListeningForUpdates();
          gameState.waitForOpponent();
@@ -41,23 +39,13 @@ class Client {
       }
    }
 
-   /*
-    * private void startListeningForUpdates() {
-    * new Thread(() -> {
-    * try {
-    * while (true) {
-    * int[] position = (int[]) in.readObject();
-    * out.write(gameState.checkForHit(position[0], position[1]));
-    * out.flush();
-    * }
-    * } catch (Exception e) {
-    * e.printStackTrace();
-    * }
-    * }).start();
-    * }
-    */
-
    public static void main(String[] args) {
-      new Client("localhost", 12345); // Connect to server
+      String serverIP;
+      if (args.length > 0) {
+         serverIP = args[0];
+      } else {
+         serverIP = "localhost";
+      }
+      new Client(serverIP, 12345); // Connect to server
    }
 }
