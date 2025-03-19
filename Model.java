@@ -227,13 +227,13 @@ public class Model {
         // something
     }
 
-    public boolean rotateShip(int xa, int ya) // index coordinates. Rotate ship clockwise about this point
+    public boolean rotateShip(int row, int col) // index coordinates. Rotate ship clockwise about this point
     {
         // if game has started, dont allow ships to move
         if (!canMoveShips) {
             return false;
         }
-        ShipType translatedShipType = yourBoard[xa][ya];
+        ShipType translatedShipType = yourBoard[row][col];
         int BattleShipsIndex = -1;
         // find the index in BattleShips (model arraylist) based on shipytype
         switch (translatedShipType) {
@@ -258,11 +258,55 @@ public class Model {
                 System.out.println("Something aint right");
                 break;
         }
-        
-        //handle horizontal ship
-        
 
-        return false;
+        //get new positions for ship
+        for (int j = 0; j < BattleShips.get(BattleShipsIndex).xy_coords.size(); j++) {
+            Point p = BattleShips.get(BattleShipsIndex).xy_coords.get(j);
+            int xDiff = (int) p.getX() - row; //not zero if ship is horizontal
+            int yDiff = (int) p.getY() - col; //not zero if ship is vertical
+            int actualDiff = Math.max(xDiff, yDiff); //figure out which one that is
+            int new_x = (int) p.getX() - actualDiff;
+            int new_y = (int) p.getY() - actualDiff;
+            
+            //check if point is empty
+            if ((yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType))
+            {
+                // System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or
+                // make it go somewhere else");
+
+                return false;
+            }
+            //print out coordindates. look for either x or y to be the same, and the other to incrementa
+            System.out.println(new_x + " " + new_y);
+            BattleShips.get(BattleShipsIndex).setNewCoords(j, new Point(new_x, new_y));
+            // check if new points are valid. no index out of bounds, and no ship already
+            // there
+            if (new_x > yourBoard.length || new_y > yourBoard.length || new_x < 0 || new_y < 0
+                    || (yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType)) 
+            {
+                // clear transferred points
+                BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
+                System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or make it go somewhere else");
+                return false;
+            }
+        }
+
+        for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
+            // set old points to empty
+            yourBoard[(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i)
+                    .getX()][(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i).getY()] = ShipType.EMPTY;
+            // SET THE MODEL TO NEW POINT
+        }
+        // if we're all good with the new points, then we can swap
+        for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
+            // SET THE MODEL TO NEW POINT
+            yourBoard[(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i)
+                    .getX()][(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY()] = translatedShipType;
+            // set the old point with the new point
+            BattleShips.get(BattleShipsIndex).xy_coords.set(i, BattleShips.get(BattleShipsIndex).new_xy_coords.get(i));
+        }
+        BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
+        return true;
     }
     public boolean isPlayersTurn() {
         return playerMove;
