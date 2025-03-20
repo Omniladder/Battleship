@@ -318,13 +318,25 @@ public class Model {
         int shipIndex = -1;
         
         switch (shipType) {
-            case CARRIER: shipIndex = 0; break;
-            case BATTLESHIP: shipIndex = 1; break;
-            case CRUISER: shipIndex = 2; break;
-            case SUBMARINE: shipIndex = 3; break;
-            case DESTROYER: shipIndex = 4; break;
-            case EMPTY: return false;
-            default: return false;
+            case CARRIER: 
+                shipIndex = 0; 
+                break;
+            case BATTLESHIP: 
+                shipIndex = 1; 
+                break;
+            case CRUISER: 
+                shipIndex = 2; 
+                break;
+            case SUBMARINE: 
+                shipIndex = 3; 
+                break;
+            case DESTROYER: 
+                shipIndex = 4; 
+                break;
+            case EMPTY: 
+                return false;
+            default: 
+                return false;//:(
         }
         
         Ship ship = BattleShips.get(shipIndex);
