@@ -97,6 +97,13 @@ public class View extends JFrame {
             xa = pcoords[0];
             ya = pcoords[1];
             // get cell index
+            if(SwingUtilities.isRightMouseButton(e)){
+                gameState.rotateShip(xa, ya);
+                renderView();
+                setVisible(true);
+                repaint();
+                ////System.out.println("Right Click");
+            }
             cellIndexStarting = gameGrid.getCellInside(new Point(xa, ya));
             scoreLabel.setText("Score: " + gameState.getScore());
             repaint(); // Redraw UI
@@ -104,6 +111,11 @@ public class View extends JFrame {
 
         @Override
         public void mouseReleased(MouseEvent event) {
+            //if right click, do nothing
+            if(SwingUtilities.isRightMouseButton(event)){
+                ////System.out.println("Right Click but release does nothing");
+                return;
+            }
             Point clickedLocation = event.getPoint();
             int[] cellIndex = gameGrid.getCellInside(clickedLocation);
             if (cellIndex[0] == -1) {

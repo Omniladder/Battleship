@@ -1,4 +1,3 @@
-
 /**
  * Battleship model class holds all data relating to current state of the game
  * as well as manages aspects of functionality such as server validation etc.
@@ -11,12 +10,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.io.File;
-//import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.Random;
-
+import java.util.Collections;
 import java.awt.image.AffineTransformOp;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
@@ -47,8 +45,8 @@ public class Model {
     private Image[] cruiserPics = new Image[3];
     private Image[] destroyerPics = new Image[2];
 
-    private ShipType[][] yourBoard = new ShipType[10][10]; // this is where your ships go
-    private CellStatus[][] theirBoard = new CellStatus[10][10]; // this is where you track hits and misses
+    private ShipType[][] yourBoard = new ShipType[10][10]; 
+    private CellStatus[][] theirBoard = new CellStatus[10][10];
     private CellStatus[][] yourHits = new CellStatus[10][10];
     private int CarrierLife = 5;
     private int BattleshipLife = 4;
@@ -56,9 +54,8 @@ public class Model {
     private int SubmarineLife = 3;
     private int DestroyerLife = 2;
     private boolean canMoveShips = true;
-    ArrayList<Ship> BattleShips = new ArrayList<>(); // this list of battleships contains ship classes
-                                                     // these contain x and y coords for translating ship stuff
-
+    ArrayList<Ship> BattleShips = new ArrayList<>();
+                                                     
     Clip explosionClip;
     Clip splashClip;
     int score = 0;
@@ -105,7 +102,6 @@ public class Model {
         setTheirBoard();
         emptyYourBoard();
         setYourBoard();
-
     }
 
     public void setLog(String logMessage) {
@@ -186,11 +182,12 @@ public class Model {
 
         while (!canPlace) {
             if (isHorizontal) {
-                row = rand.nextInt(10); // Random row
-                col = rand.nextInt(10 - size); // Ensure ship fits within bounds
+                BattleShips.get(shipListIndex).isHorizontal = true;
+                row = rand.nextInt(10);
+                col = rand.nextInt(10 - size);
             } else {
-                row = rand.nextInt(10 - size); // Ensure ship fits within bounds
-                col = rand.nextInt(10); // Random column
+                row = rand.nextInt(10 - size);
+                col = rand.nextInt(10);
             }
 
             canPlace = true;
@@ -212,26 +209,22 @@ public class Model {
             for (int i = 0; i < size; i++) {
                 if (isHorizontal) {
                     BattleShips.get(shipListIndex).isHorizontal = true;
-                    // get correct ship --> access coords list --> get specific coord --> set it
+                    BattleShips.get(shipListIndex).setOrientation(1);
                     BattleShips.get(shipListIndex).setShipPoint(row, col + i, i);
                     yourBoard[row][col + i] = s;
                     shipPics[row][col + i] = ((BufferedImage) getShipImage(s, i));
                 } else {
                     BattleShips.get(shipListIndex).isHorizontal = false;
+                    BattleShips.get(shipListIndex).setOrientation(0);
                     BattleShips.get(shipListIndex).setShipPoint(row + i, col, i);
-                    // BattleShips.get(shipListIndex).x_coords.set(i,row+i);
-                    // BattleShips.get(shipListIndex).y_coords.set(i,col);
                     yourBoard[row + i][col] = s;
                     shipPics[row + i][col] = rotateImage((BufferedImage) getShipImage(s, i));
                 }
             }
-
         }
     }
 
     private BufferedImage rotateImage(BufferedImage originalImage) {
-        // Create an AffineTransform for the rotation
-        // Rotation information
         double rotationRequired = Math.toRadians(-90);
         double locationX = originalImage.getWidth() / 2;
         double locationY = originalImage.getHeight() / 2;
@@ -239,23 +232,16 @@ public class Model {
                 locationX, locationY);
         AffineTransformOp op = new AffineTransformOp(tx,
                 AffineTransformOp.TYPE_BILINEAR);
-
         return op.filter(originalImage, null);
     }
 
-    // either return false, or <-1,-1> to show bad placement
-    // clicked section doesnt matter. all points translated the same
-    // points might be doubles, not ints. if thats the case:
-    // cast double --> int --> string
-    public boolean moveShipFromAtoB(int xa, int ya, int xb, int yb) // index coordinates
+    public boolean moveShipFromAtoB(int xa, int ya, int xb, int yb)
     {
-        // if game has started, dont allow ships to move
         if (!canMoveShips) {
             return false;
         }
         ShipType translatedShipType = yourBoard[xa][ya];
         int BattleShipsIndex = -1;
-        // find the index in BattleShips (model arraylist) based on shipytype
         switch (translatedShipType) {
             case CARRIER:
                 BattleShipsIndex = 0;
@@ -275,58 +261,35 @@ public class Model {
             case EMPTY:
                 return false;
             default:
-                System.out.println("Something aint right");
                 break;
         }
 
-        // difference in points. where you dragged from doesnt matter
         int dx = xb - xa;
         int dy = yb - ya;
-
-        // check to see if points are valid
 
         for (int j = 0; j < BattleShips.get(BattleShipsIndex).xy_coords.size(); j++) {
             Point p = BattleShips.get(BattleShipsIndex).xy_coords.get(j);
             int new_x = (int) p.getX() + dx;
             int new_y = (int) p.getY() + dy;
-            if ((yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType)) // cannot
-                                                                                                              // translate
-                                                                                                              // point.
-                                                                                                              // space
-                                                                                                              // already
-                                                                                                              // occupied
+            if ((yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType))
             {
-                // System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or
-                // make it go somewhere else");
                 return false;
             }
             BattleShips.get(BattleShipsIndex).setNewCoords(j, new Point(new_x, new_y));
-            // check if new points are valid. no index out of bounds, and no ship already
-            // there
             if (new_x > yourBoard.length || new_y > yourBoard.length || new_x < 0 || new_y < 0
-                    || (yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType)) // cannot
-                                                                                                                     // translate
-                                                                                                                     // point.
-                                                                                                                     // space
-                                                                                                                     // already
-                                                                                                                     // occupied
+                    || (yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType))
             {
-                // clear transferred points
                 BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
                 return false;
             }
         }
 
         for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
-            // set old points to empty
             yourBoard[(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i)
                     .getX()][(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i).getY()] = ShipType.EMPTY;
-            // SET THE MODEL TO NEW POINT
         }
 
-        // if we're all good with the new points, then we can swap
         for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
-            // SET THE MODEL TO NEW POINT
             yourBoard[(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i)
                     .getX()][(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY()] = translatedShipType;
 
@@ -340,102 +303,106 @@ public class Model {
                         .getX()][(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY()] = rotateImage(
                                 (BufferedImage) getShipImage(translatedShipType, i));
             }
-            // set the old point with the new point
             BattleShips.get(BattleShipsIndex).xy_coords.set(i, BattleShips.get(BattleShipsIndex).new_xy_coords.get(i));
         }
         BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
         return true;
-
-        // how should we move ships?
-        // ships down randomly --> click on shipsquare --> records position --> when
-        // released, check if valid
-        // if valid, iterate through points list and translate coordinates, if not
-        // return to square
-        // maybe make image (square,arrow,etc...) follow cursor to show user is doing
-        // something
     }
 
-    public boolean rotateShip(int row, int col) // index coordinates. Rotate ship clockwise about this point
-    {
-        // if game has started, dont allow ships to move
+    public boolean rotateShip(int row, int col) {
         if (!canMoveShips) {
             return false;
         }
-        ShipType translatedShipType = yourBoard[row][col];
-        int BattleShipsIndex = -1;
-        // find the index in BattleShips (model arraylist) based on shipytype
-        switch (translatedShipType) {
-            case CARRIER:
-                BattleShipsIndex = 0;
-                break;
-            case BATTLESHIP:
-                BattleShipsIndex = 1;
-                break;
-            case CRUISER:
-                BattleShipsIndex = 2;
-                break;
-            case SUBMARINE:
-                BattleShipsIndex = 3;
-                break;
-            case DESTROYER:
-                BattleShipsIndex = 4;
-                break;
-            case EMPTY:
-                return false;
-            default:
-                System.out.println("Something aint right");
-                break;
+        
+        ShipType shipType = yourBoard[row][col];
+        int shipIndex = -1;
+        
+        switch (shipType) {
+            case CARRIER: shipIndex = 0; break;
+            case BATTLESHIP: shipIndex = 1; break;
+            case CRUISER: shipIndex = 2; break;
+            case SUBMARINE: shipIndex = 3; break;
+            case DESTROYER: shipIndex = 4; break;
+            case EMPTY: return false;
+            default: return false;
         }
-
-        //get new positions for ship
-        for (int j = 0; j < BattleShips.get(BattleShipsIndex).xy_coords.size(); j++) {
-            Point p = BattleShips.get(BattleShipsIndex).xy_coords.get(j);
-            int xDiff = (int) p.getX() - row; //not zero if ship is horizontal
-            int yDiff = (int) p.getY() - col; //not zero if ship is vertical
-            int actualDiff = Math.max(xDiff, yDiff); //figure out which one that is
-            int new_x = (int) p.getX() - actualDiff;
-            int new_y = (int) p.getY() - actualDiff;
+        
+        Ship ship = BattleShips.get(shipIndex);
+        ship.new_xy_coords.clear();
+        
+        // Find the pivot point (where user clicked) and its index
+        Point pivot = new Point(row, col);
+        int pivotIndex = -1;
+        for (int i = 0; i < ship.xy_coords.size(); i++) {
+            if (ship.xy_coords.get(i).equals(pivot)) {
+                pivotIndex = i;
+                break;
+            }
+        }
+        if (pivotIndex == -1) return false;
+        
+        // Calculate new orientation
+        boolean wasHorizontal = ship.isHorizontal;
+        int newOrientation = (ship.orientation + 1) % 4;
+        
+        // Calculate new coordinates relative to pivot point
+        int shipLength = ship.xy_coords.size();
+        for (int i = 0; i < shipLength; i++) {
+            int newX, newY;
+            int offset = i - pivotIndex;  // Offset from pivot point
             
-            //check if point is empty
-            if ((yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType))
-            {
-                // System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or
-                // make it go somewhere else");
-
+            if (wasHorizontal) {
+                // Horizontal to vertical
+                newX = row + offset;
+                newY = col;
+            } else {
+                // Vertical to horizontal
+                newX = row;
+                newY = col + offset;
+            }
+            
+            // Check if new position is valid
+            if (newX >= yourBoard.length || newY >= yourBoard[0].length || newX < 0 || newY < 0
+                    || (yourBoard[newX][newY] != ShipType.EMPTY && yourBoard[newX][newY] != shipType)) {
+                ship.new_xy_coords.clear();
                 return false;
             }
-            //print out coordindates. look for either x or y to be the same, and the other to incrementa
-            System.out.println(new_x + " " + new_y);
-            BattleShips.get(BattleShipsIndex).setNewCoords(j, new Point(new_x, new_y));
-            // check if new points are valid. no index out of bounds, and no ship already
-            // there
-            if (new_x > yourBoard.length || new_y > yourBoard.length || new_x < 0 || new_y < 0
-                    || (yourBoard[new_x][new_y] != ShipType.EMPTY && yourBoard[new_x][new_y] != translatedShipType)) 
-            {
-                // clear transferred points
-                BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
-                System.out.println("SHIP CANT MOVE THERE. REMOVE THIS MESSAGE WHEN DONE, or make it go somewhere else");
-                return false;
+            
+            ship.setNewCoords(i, new Point(newX, newY));
+        }
+        
+        // Update orientation
+        ship.setOrientation(newOrientation);
+        ship.isHorizontal = !wasHorizontal;
+        
+        // Clear old positions
+        for (Point oldPoint : ship.xy_coords) {
+            yourBoard[oldPoint.x][oldPoint.y] = ShipType.EMPTY;
+            shipPics[oldPoint.x][oldPoint.y] = null;
+        }
+        
+        // Set new positions with correct image ordering
+        for (int i = 0; i < shipLength; i++) {
+            Point newPoint = ship.new_xy_coords.get(i);
+            yourBoard[newPoint.x][newPoint.y] = shipType;
+            
+            // Calculate correct image index based on position relative to pivot
+            int imageIndex;
+            if (ship.isHorizontal) {
+                imageIndex = i - pivotIndex + pivotIndex;
+                shipPics[newPoint.x][newPoint.y] = getShipImage(shipType, imageIndex);
+            } else {
+                imageIndex = i - pivotIndex + pivotIndex;
+                shipPics[newPoint.x][newPoint.y] = rotateImage((BufferedImage) getShipImage(shipType, imageIndex));
             }
+            
+            ship.xy_coords.set(i, newPoint);
         }
-
-        for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
-            // set old points to empty
-            yourBoard[(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i)
-                    .getX()][(int) BattleShips.get(BattleShipsIndex).xy_coords.get(i).getY()] = ShipType.EMPTY;
-            // SET THE MODEL TO NEW POINT
-        }
-        // if we're all good with the new points, then we can swap
-        for (int i = 0; i < BattleShips.get(BattleShipsIndex).xy_coords.size(); i++) {
-            // SET THE MODEL TO NEW POINT
-            yourBoard[(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i)
-                    .getX()][(int) BattleShips.get(BattleShipsIndex).new_xy_coords.get(i).getY()] = translatedShipType;
-            // set the old point with the new point
-            BattleShips.get(BattleShipsIndex).xy_coords.set(i, BattleShips.get(BattleShipsIndex).new_xy_coords.get(i));
-        }
-        BattleShips.get(BattleShipsIndex).new_xy_coords.clear();
+        
+        ship.new_xy_coords.clear();
         return true;
     }
+
     public boolean isPlayersTurn() {
         return playerMove;
     }
@@ -453,6 +420,9 @@ public class Model {
                 logMessage = "HIT";
                 explosionClip.start();
                 explosionClip = getSound("sound/hit.wav");
+                if (score == 17) {
+                    logMessage = "YOU WIN!";
+                }
             } else {
                 theirBoard[row][col] = Model.CellStatus.MISS;
                 logMessage = "MISSED";
@@ -462,14 +432,12 @@ public class Model {
             playerMove = !playerMove;
 
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error: " + e);
+            //////////////System.out.println("Error: " + e);
         }
-
     }
 
     public void waitForOpponent() {
         new Thread(() -> {
-
             while (!playerMove) {
                 try {
                     int[] firePosition = (int[]) in.readObject();
@@ -483,17 +451,14 @@ public class Model {
                     out.flush();
                     playerMove = !playerMove;
                 } catch (IOException | ClassNotFoundException e) {
-                    System.out.println("Error: " + e);
+                    //////////////System.out.println("Error: " + e);
                 }
             }
         }).start();
     }
 
-    // this is if they hit you
-    public int checkForHit(int row, int col) // returns -1 for miss, 0 for hit with no sink, and 1-5 for a hit+sink on
-                                             // a ship
+    public int checkForHit(int row, int col)
     {
-        // System.out.println("Check Hit:" + yourBoard[row][col]);
         int toReturn = 0;
         switch (yourBoard[row][col]) {
             case CARRIER:
@@ -526,8 +491,7 @@ public class Model {
         return toReturn;
     }
 
-    private void printSinkMessage(int hitResult) { // pass in hit data from checkForHit to get correct message to
-                                                   // display
+    private void printSinkMessage(int hitResult) {
         switch (hitResult) {
             case -1:
                 break;
@@ -549,28 +513,11 @@ public class Model {
                 logMessage = "You sunk the Carrier!";
                 break;
             default:
-                System.out.println("Invalid hit result.");
+                //////////////System.out.println("Invalid hit result.");
                 break;
         }
     }
 
-    /*
-     * public void processScoreData(int row, int col, int hitData) // when you find
-     * out you got a hit, this is how you
-     * // process that and change your board.
-     * { // there should be a subsequent call in controller to send boardState to
-     * view
-     * if (hitData >= 0) {
-     * score++;
-     * theirBoard[row][col] = CellStatus.HIT;
-     * } else {
-     * theirBoard[row][col] = CellStatus.MISS;
-     * }
-     * 
-     * // printSinkMessage(hitData); // doesnt necessarily require sink, but prints
-     * // hit, miss, sink stuff
-     * }
-     */
     public void setHit(int row, int col) {
         theirBoard[row][col] = CellStatus.HIT;
     }
@@ -599,12 +546,10 @@ public class Model {
 
     private boolean getRandomOrientation() {
         Random rand = new Random();
-        return rand.nextBoolean(); // Returns true for horizontal, false for vertical
+        return rand.nextBoolean();
     }
 
     public void setYourBoard() {
-
-        // Create ships to avoid IOB exception
         Ship Carrier = new Ship();
         for (int i = 0; i < 5; i++) {
             Carrier.xy_coords.add(new Point(777, 777));
@@ -648,10 +593,6 @@ public class Model {
         placeShip(DestroyerLife, ShipType.DESTROYER, getRandomOrientation(), 4);
     }
 
-    /*
-     * Functions relating to getting the current state of the board relative to the
-     * player and the opponent
-     */
     public ShipType getYourBoardIndex(int x, int y) {
         return yourBoard[x][y];
     }
@@ -668,37 +609,33 @@ public class Model {
         return theirBoard;
     }
 
-    /*
-     * Debugging code used for outputting current state of the board to Console
-     */
     public void printBoard() {
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
                 System.out.print("+-+");
             }
-            System.out.println("");
+            //////////////System.out.println("");
             for (int y = 0; y < boardSize; y++) {
                 if (yourBoard[y][x] != ShipType.EMPTY) {
-                    System.out.print("|X|"); // Marks the location of a ship
+                    System.out.print("|X|");
                 } else {
-                    System.out.print("| |"); // Marker for water
+                    System.out.print("| |");
                 }
             }
-            System.out.println("");
+            //////////////System.out.println("");
         }
         for (int y = 0; y < boardSize; y++) {
             System.out.print("+-+");
         }
-        System.out.println("");
+        //////////////System.out.println("");
     }
 
     public void printTestMessage() {
-        System.out.println("Test button clicked!");
+        //////////////System.out.println("Test button clicked!");
     }
 
     public void handleTestButtonClick() {
-        System.out.println("Test button clicked in Model!");
-        // Add any additional logic you want to execute when the button is clicked
+        //////////////System.out.println("Test button clicked in Model!");
     }
 }
 
@@ -707,6 +644,7 @@ class Ship {
     ArrayList<java.awt.Point> new_xy_coords = new ArrayList<>();
     Boolean isHorizontal;
     Model.ShipType type;
+    int orientation;
 
     void setNewCoords(int index, Point p) {
         if (index >= new_xy_coords.size()) {
@@ -714,6 +652,10 @@ class Ship {
         } else {
             new_xy_coords.set(index, p);
         }
+    }
+    
+    void setOrientation(int orient) {
+        orientation = orient;
     }
 
     void setShipPoint(int x, int y, int index) {
